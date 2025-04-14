@@ -76,6 +76,13 @@
     <div class="form-container no-print bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold mb-4 text-center">Assignment Cover Page Generator</h2>
         <form id="coverPageForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- New field for assignment title -->
+            <div class="md:col-span-2">
+                <label for="assignmentTitle" class="block text-sm font-medium text-gray-700 mb-1">Assignment Title:</label>
+                <input type="text" id="assignmentTitle" class="w-full p-2 border border-gray-300 rounded" value="ASSIGNMENT">
+                <p class="text-xs text-gray-500 mt-1">This text will appear as the title of your cover page</p>
+            </div>
+            
             <div>
                 <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Name:</label>
                 <input type="text" id="courseName" class="w-full p-2 border border-gray-300 rounded" value="Calculus I">
@@ -144,9 +151,9 @@
                              class="h-28 object-contain">
                     </div>
 
-                    <!-- Assignment Title -->
+                    <!-- Assignment Title - Now using dynamic content -->
                     <div class="text-center">
-                        <h1 class="text-3xl font-bold underline">ASSIGNMENT</h1>
+                        <h1 class="text-3xl font-bold underline" id="displayAssignmentTitle">ASSIGNMENT</h1>
                     </div>
 
                     <!-- Course Information -->
@@ -270,6 +277,7 @@
         // Function to save data to Google Sheets via SheetDB
         async function saveToGoogleSheets() {
             try {
+                const assignmentTitle = document.getElementById('assignmentTitle').value;
                 const studentId = document.getElementById('studentId').value;
                 const studentName = document.getElementById('studentName').value;
                 const section = document.getElementById('section').value;
@@ -279,6 +287,7 @@
                 
                 // Create data object - FIXED: using studentName instead of name
                 const data = {
+                    assignmentTitle: assignmentTitle || 'ASSIGNMENT',
                     studentId: studentId || 'Not provided',
                     studentName: studentName || 'Not provided', // Changed from 'name' to 'studentName'
                     section: section || 'Not provided',
@@ -363,6 +372,7 @@
 
         // Function to update the preview
         function updatePreview() {
+            const assignmentTitle = document.getElementById('assignmentTitle').value || 'ASSIGNMENT';
             const courseName = document.getElementById('courseName').value || 'Calculus I';
             const courseCode = document.getElementById('courseCode').value || 'MAT123';
             const submissionDate = document.getElementById('submissionDate').value;
@@ -374,6 +384,9 @@
             const teacherPosition = document.getElementById('teacherPosition').value || 'Lecturer';
             const department = document.getElementById('department').value || 'Computer Science and Engineering';
 
+            // Update assignment title
+            document.getElementById('displayAssignmentTitle').textContent = assignmentTitle;
+            
             document.getElementById('displayCourseName').textContent = courseName;
             document.getElementById('displayCourseCode').textContent = courseCode;
             
