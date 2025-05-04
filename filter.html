@@ -1,685 +1,697 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cover Page Data Filter</title>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7ZV70MZE13"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cover Page Data Filter</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7ZV70MZE13"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-      gtag('config', 'G-7ZV70MZE13');
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-            display: none;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .stats-card {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #4a5568;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        th {
-            background-color: #f8fafc;
-            font-weight: 600;
-            color: #4a5568;
-        }
-        
-        tr:hover {
-            background-color: #f1f5f9;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        
-        .pagination button {
-            background-color: #e2e8f0;
-            border: none;
-            color: #4a5568;
-            padding: 8px 16px;
-            margin: 0 4px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        
-        .pagination button.active {
-            background-color: #3b82f6;
-            color: white;
-        }
-        
-        .pagination button:hover:not(.active) {
-            background-color: #cbd5e1;
-        }
-        
-        .pagination button:disabled {
-            background-color: #e2e8f0;
-            color: #94a3b8;
-            cursor: not-allowed;
-        }
-        
-        .count-badge {
-            background-color: #3b82f6;
-            color: white;
-            border-radius: 9999px;
-            padding: 2px 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-    </style>
+    gtag('config', 'G-7ZV70MZE13');
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+      .loader {
+          border: 4px solid #f3f3f3;
+          border-radius: 50%;
+          border-top: 4px solid #3498db;
+          width: 30px;
+          height: 30px;
+          animation: spin 1s linear infinite;
+          margin: 20px auto;
+          display: none;
+      }
+      
+      @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+      
+      .stats-card {
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          padding: 20px;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          margin-bottom: 20px;
+      }
+      
+      .stats-number {
+          font-size: 2.5rem;
+          font-weight: bold;
+          color: #4a5568;
+      }
+      
+      .table-container {
+          overflow-x: auto;
+      }
+      
+      table {
+          width: 100%;
+          border-collapse: collapse;
+      }
+      
+      th, td {
+          padding: 12px 15px;
+          text-align: left;
+          border-bottom: 1px solid #e2e8f0;
+      }
+      
+      th {
+          background-color: #f8fafc;
+          font-weight: 600;
+          color: #4a5568;
+      }
+      
+      tr:hover {
+          background-color: #f1f5f9;
+      }
+      
+      .pagination {
+          display: flex;
+          justify-content: center;
+          margin-top: 20px;
+      }
+      
+      .pagination button {
+          background-color: #e2e8f0;
+          border: none;
+          color: #4a5568;
+          padding: 8px 16px;
+          margin: 0 4px;
+          cursor: pointer;
+          border-radius: 4px;
+      }
+      
+      .pagination button.active {
+          background-color: #3b82f6;
+          color: white;
+      }
+      
+      .pagination button:hover:not(.active) {
+          background-color: #cbd5e1;
+      }
+      
+      .pagination button:disabled {
+          background-color: #e2e8f0;
+          color: #94a3b8;
+          cursor: not-allowed;
+      }
+      
+      .count-badge {
+          background-color: #3b82f6;
+          color: white;
+          border-radius: 9999px;
+          padding: 2px 8px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          margin-left: 8px;
+      }
+  </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">Cover Page Data Filter</h1>
-            <a href="index.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Back to Generator
-            </a>
-        </div>
-        
-        <!-- API Selection -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-xl font-semibold mb-4">Select API and Load Data</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="apiSelect" class="block text-sm font-medium text-gray-700 mb-1">API Endpoint:</label>
-                    <select id="apiSelect" class="w-full p-2 border border-gray-300 rounded">
-                        <option value="0">API 1 (Primary)</option>
-                        <option value="1">API 2</option>
-                        <option value="2">API 3</option>
-                        <option value="3">API 4</option>
-                        <option value="4">API 5</option>
-                        <option value="5">API 6</option>
-                        <option value="auto">Auto (Try each API in order)</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button id="loadDataBtn" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-                        Load Data
-                    </button>
-                </div>
-            </div>
-            <div id="apiStatus" class="mt-4 text-sm"></div>
-        </div>
-        
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="stats-card">
-                <h3 class="text-lg font-semibold text-gray-600">Total Templates</h3>
-                <p class="stats-number" id="totalTemplates">0</p>
-            </div>
-            <div class="stats-card">
-                <h3 class="text-lg font-semibold text-gray-600">Unique Students</h3>
-                <p class="stats-number" id="uniqueStudents">0</p>
-            </div>
-            <div class="stats-card">
-                <h3 class="text-lg font-semibold text-gray-600">Templates Today</h3>
-                <p class="stats-number" id="todayTemplates">0</p>
-            </div>
-        </div>
-        
-        <!-- Filter Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-xl font-semibold mb-4">Filter Data</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="studentIdFilter" class="block text-sm font-medium text-gray-700 mb-1">Student ID:</label>
-                    <input type="text" id="studentIdFilter" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter Student ID">
-                </div>
-                <div>
-                    <label for="dateFilter" class="block text-sm font-medium text-gray-700 mb-1">Date:</label>
-                    <input type="date" id="dateFilter" class="w-full p-2 border border-gray-300 rounded">
-                </div>
-                <div>
-                    <label for="departmentFilter" class="block text-sm font-medium text-gray-700 mb-1">Department:</label>
-                    <select id="departmentFilter" class="w-full p-2 border border-gray-300 rounded">
-                        <option value="">All Departments</option>
-                        <!-- Will be populated dynamically -->
-                    </select>
-                </div>
-                <div>
-                    <label for="sectionFilter" class="block text-sm font-medium text-gray-700 mb-1">Section:</label>
-                    <select id="sectionFilter" class="w-full p-2 border border-gray-300 rounded">
-                        <option value="">All Sections</option>
-                        <!-- Will be populated dynamically -->
-                    </select>
-                </div>
-            </div>
-            <div class="mt-4 flex justify-end">
-                <button id="resetFilterBtn" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2">
-                    Reset Filters
-                </button>
-                <button id="applyFilterBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                    Apply Filters
-                </button>
-            </div>
-        </div>
-        
-        <!-- Filter Results Summary -->
-        <div id="filterSummary" class="bg-white p-6 rounded-lg shadow-md mb-8" style="display: none;">
-            <h2 class="text-xl font-semibold mb-4">Filter Results</h2>
-            
-            <!-- Student Templates -->
-            <div id="studentTemplatesCard" class="mb-4" style="display: none;">
-                <h3 class="text-lg font-semibold">Student Templates</h3>
-                <div class="flex flex-wrap items-center gap-2">
-                    <p>Student ID: <span id="displayStudentId" class="font-semibold"></span></p>
-                    <p>Name: <span id="displayStudentName" class="font-semibold"></span></p>
-                    <p>Templates Created: <span id="studentTemplateCount" class="font-semibold text-blue-600"></span></p>
-                </div>
-            </div>
-            
-            <!-- Department Templates -->
-            <div id="departmentTemplatesCard" class="mb-4" style="display: none;">
-                <h3 class="text-lg font-semibold">Department Templates</h3>
-                <div class="flex flex-wrap items-center gap-2">
-                    <p>Department: <span id="displayDepartment" class="font-semibold"></span></p>
-                    <p>Templates Created: <span id="departmentTemplateCount" class="font-semibold text-blue-600"></span></p>
-                </div>
-            </div>
-            
-            <!-- Section Templates -->
-            <div id="sectionTemplatesCard" class="mb-4" style="display: none;">
-                <h3 class="text-lg font-semibold">Section Templates</h3>
-                <div class="flex flex-wrap items-center gap-2">
-                    <p>Section: <span id="displaySection" class="font-semibold"></span></p>
-                    <p>Templates Created: <span id="sectionTemplateCount" class="font-semibold text-blue-600"></span></p>
-                </div>
-            </div>
-            
-            <!-- Date Templates -->
-            <div id="dateTemplatesCard" class="mb-4" style="display: none;">
-                <h3 class="text-lg font-semibold">Date Templates</h3>
-                <div class="flex flex-wrap items-center gap-2">
-                    <p>Date: <span id="displayDate" class="font-semibold"></span></p>
-                    <p>Templates Created: <span id="dateTemplateCount" class="font-semibold text-blue-600"></span></p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Results Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-4">Results</h2>
-            <div id="loader" class="loader"></div>
-            <div id="noResults" class="text-center py-8 text-gray-500" style="display: none;">
-                No results found. Try different filter criteria.
-            </div>
-            <div id="noData" class="text-center py-8 text-gray-500">
-                No data loaded. Please click "Load Data" to fetch data from the API.
-            </div>
-            <div id="resultsContainer" class="table-container" style="display: none;">
-                <table id="resultsTable">
-                    <thead>
-                        <tr>
-                            <th>Student ID</th>
-                            <th>Name</th>
-                            <th>Section</th>
-                            <th>Department</th>
-                            <th>Course Name</th>
-                            <th>Teacher Name</th>
-                            <th>Created Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsBody">
-                        <!-- Results will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-            <div id="pagination" class="pagination mt-4">
-                <!-- Pagination will be added here -->
-            </div>
-        </div>
-    </div>
+  <div class="container mx-auto px-4 py-8">
+      <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold text-gray-800">Cover Page Data Filter</h1>
+          <div class="button-wrapper flex space-x-3">
+              <a href="index.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                  Back to Generator
+              </a>
+              <a href="https://docs.google.com/spreadsheets/d/1g6fr1HS2yDFhbR5urjQiOL8lB_oE3V3w4ca7JcAtKGA/edit?gid=0#gid=0"
+                 class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" target="_blank">
+                  See Block List
+              </a>
+          </div>
+      </div>
+      
+      <!-- API Selection -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+          <h2 class="text-xl font-semibold mb-4">Select API and Load Data</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                  <label for="apiSelect" class="block text-sm font-medium text-gray-700 mb-1">API Endpoint:</label>
+                  <select id="apiSelect" class="w-full p-2 border border-gray-300 rounded">
+                      <option value="0">API 1 (Primary)</option>
+                      <option value="1">API 2</option>
+                      <option value="2">API 3</option>
+                      <option value="3">API 4</option>
+                      <option value="4">API 5</option>
+                      <option value="5">API 6</option>
+                      <option value="auto">Auto (Try each API in order)</option>
+                  </select>
+              </div>
+              <div class="flex items-end">
+                  <button id="loadDataBtn" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                      Load Data
+                  </button>
+              </div>
+          </div>
+          <div id="apiStatus" class="mt-4 text-sm"></div>
+      </div>
+      
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="stats-card">
+              <h3 class="text-lg font-semibold text-gray-600">Total Templates</h3>
+              <p class="stats-number" id="totalTemplates">0</p>
+          </div>
+          <div class="stats-card">
+              <h3 class="text-lg font-semibold text-gray-600">Unique Students</h3>
+              <p class="stats-number" id="uniqueStudents">0</p>
+          </div>
+          <div class="stats-card">
+              <h3 class="text-lg font-semibold text-gray-600">Templates Today</h3>
+              <p class="stats-number" id="todayTemplates">0</p>
+          </div>
+      </div>
+      
+      <!-- Filter Section -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+          <h2 class="text-xl font-semibold mb-4">Filter Data</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                  <label for="studentIdFilter" class="block text-sm font-medium text-gray-700 mb-1">Student ID:</label>
+                  <input type="text" id="studentIdFilter" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter Student ID">
+              </div>
+              <div>
+                  <label for="dateFilter" class="block text-sm font-medium text-gray-700 mb-1">Date:</label>
+                  <input type="date" id="dateFilter" class="w-full p-2 border border-gray-300 rounded">
+              </div>
+              <div>
+                  <label for="departmentFilter" class="block text-sm font-medium text-gray-700 mb-1">Department:</label>
+                  <select id="departmentFilter" class="w-full p-2 border border-gray-300 rounded">
+                      <option value="">All Departments</option>
+                      <!-- Will be populated dynamically -->
+                  </select>
+              </div>
+              <div>
+                  <label for="sectionFilter" class="block text-sm font-medium text-gray-700 mb-1">Section:</label>
+                  <select id="sectionFilter" class="w-full p-2 border border-gray-300 rounded">
+                      <option value="">All Sections</option>
+                      <!-- Will be populated dynamically -->
+                  </select>
+              </div>
+          </div>
+          <div class="mt-4 flex justify-end">
+              <button id="resetFilterBtn" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2">
+                  Reset Filters
+              </button>
+              <button id="applyFilterBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                  Apply Filters
+              </button>
+          </div>
+      </div>
+      
+      <!-- Filter Results Summary -->
+      <div id="filterSummary" class="bg-white p-6 rounded-lg shadow-md mb-8" style="display: none;">
+          <h2 class="text-xl font-semibold mb-4">Filter Results</h2>
+          
+          <!-- Student Templates -->
+          <div id="studentTemplatesCard" class="mb-4" style="display: none;">
+              <h3 class="text-lg font-semibold">Student Templates</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                  <p>Student ID: <span id="displayStudentId" class="font-semibold"></span></p>
+                  <p>Name: <span id="displayStudentName" class="font-semibold"></span></p>
+                  <p>Templates Created: <span id="studentTemplateCount" class="font-semibold text-blue-600"></span></p>
+              </div>
+          </div>
+          
+          <!-- Department Templates -->
+          <div id="departmentTemplatesCard" class="mb-4" style="display: none;">
+              <h3 class="text-lg font-semibold">Department Templates</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                  <p>Department: <span id="displayDepartment" class="font-semibold"></span></p>
+                  <p>Templates Created: <span id="departmentTemplateCount" class="font-semibold text-blue-600"></span></p>
+              </div>
+          </div>
+          
+          <!-- Section Templates -->
+          <div id="sectionTemplatesCard" class="mb-4" style="display: none;">
+              <h3 class="text-lg font-semibold">Section Templates</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                  <p>Section: <span id="displaySection" class="font-semibold"></span></p>
+                  <p>Templates Created: <span id="sectionTemplateCount" class="font-semibold text-blue-600"></span></p>
+              </div>
+          </div>
+          
+          <!-- Date Templates -->
+          <div id="dateTemplatesCard" class="mb-4" style="display: none;">
+              <h3 class="text-lg font-semibold">Date Templates</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                  <p>Date: <span id="displayDate" class="font-semibold"></span></p>
+                  <p>Templates Created: <span id="dateTemplateCount" class="font-semibold text-blue-600"></span></p>
+              </div>
+          </div>
+      </div>
+      
+      <!-- Results Section -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-4">Results</h2>
+          <div id="loader" class="loader"></div>
+          <div id="noResults" class="text-center py-8 text-gray-500" style="display: none;">
+              No results found. Try different filter criteria.
+          </div>
+          <div id="noData" class="text-center py-8 text-gray-500">
+              No data loaded. Please click "Load Data" to fetch data from the API.
+          </div>
+          <div id="resultsContainer" class="table-container" style="display: none;">
+              <table id="resultsTable">
+                  <thead>
+                      <tr>
+                          <th>Student ID</th>
+                          <th>Name</th>
+                          <th>Section</th>
+                          <th>Department</th>
+                          <th>Course Name</th>
+                          <th>Teacher Name</th>
+                          <th>Created Date</th>
+                      </tr>
+                  </thead>
+                  <tbody id="resultsBody">
+                      <!-- Results will be populated here -->
+                  </tbody>
+              </table>
+          </div>
+          <div id="pagination" class="pagination mt-4">
+              <!-- Pagination will be added here -->
+          </div>
+      </div>
+  </div>
 
-    <script>
-        // SheetDB API endpoints
-        const sheetDbApis = [
-            'https://sheetdb.io/api/v1/j2l9m7ykx1dtt',
-            'https://sheetdb.io/api/v1/5m1omtva8avsk',
-            'https://sheetdb.io/api/v1/61kyqimj66opr',
-            'https://sheetdb.io/api/v1/0lbjvqvqaht7u',
-            'https://sheetdb.io/api/v1/y3v109nzuzvwf',
-            'https://sheetdb.io/api/v1/xut3wtv9lzil4'
-        ];
-        
-        // Global variables
-        let allData = [];
-        let filteredData = [];
-        let currentPage = 1;
-        const rowsPerPage = 10;
-        let currentApiIndex = 0;
-        let dataLoaded = false;
-        
-        // Function to fetch data from a single API
-        async function fetchData(apiIndex) {
-            showLoader();
-            updateApiStatus(`Trying API ${apiIndex + 1}...`);
-            
-            try {
-                const response = await fetch(sheetDbApis[apiIndex]);
-                
-                if (!response.ok) {
-                    throw new Error(`API ${apiIndex + 1} responded with status ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (!Array.isArray(data) || data.length === 0) {
-                    throw new Error(`API ${apiIndex + 1} returned no data`);
-                }
-                
-                updateApiStatus(`Successfully loaded data from API ${apiIndex + 1}`);
-                return data;
-                
-            } catch (error) {
-                updateApiStatus(`Error with API ${apiIndex + 1}: ${error.message}`, true);
-                throw error;
-            }
-        }
-        
-        // Function to try APIs in sequence
-        async function tryApisInSequence() {
-            showLoader();
-            
-            const apiSelect = document.getElementById('apiSelect');
-            const selectedValue = apiSelect.value;
-            
-            if (selectedValue === 'auto') {
-                // Try each API in sequence
-                for (let i = 0; i < sheetDbApis.length; i++) {
-                    try {
-                        const data = await fetchData(i);
-                        allData = data;
-                        currentApiIndex = i;
-                        dataLoaded = true;
-                        break; // Stop after first successful API
-                    } catch (error) {
-                        console.error(`API ${i + 1} failed:`, error);
-                        // Continue to next API
-                    }
-                }
-                
-                if (!dataLoaded) {
-                    updateApiStatus('All APIs failed. Please try again later.', true);
-                }
-            } else {
-                // Try only the selected API
-                const apiIndex = parseInt(selectedValue);
-                try {
-                    const data = await fetchData(apiIndex);
-                    allData = data;
-                    currentApiIndex = apiIndex;
-                    dataLoaded = true;
-                } catch (error) {
-                    updateApiStatus(`Failed to load data from API ${apiIndex + 1}. Please try another API.`, true);
-                }
-            }
-            
-            if (dataLoaded) {
-                // Update UI with data
-                document.getElementById('noData').style.display = 'none';
-                document.getElementById('resultsContainer').style.display = 'block';
-                
-                // Update stats and filters
-                updateStats();
-                populateFilters();
-                resetFilters();
-                applyFilters();
-            }
-            
-            hideLoader();
-        }
-        
-        // Function to update API status message
-        function updateApiStatus(message, isError = false) {
-            const statusElement = document.getElementById('apiStatus');
-            statusElement.textContent = message;
-            statusElement.className = isError ? 'text-red-600' : 'text-green-600';
-        }
-        
-        // Function to update statistics
-        function updateStats() {
-            if (!dataLoaded) return;
-            
-            // Total templates
-            document.getElementById('totalTemplates').textContent = allData.length;
-            
-            // Unique students
-            const uniqueStudentIds = new Set(allData.map(item => item.studentId).filter(Boolean));
-            document.getElementById('uniqueStudents').textContent = uniqueStudentIds.size;
-            
-            // Templates created today
-            const today = new Date().toLocaleDateString('en-GB'); // DD/MM/YYYY
-            const todayCount = allData.filter(item => {
-                // Handle different date formats
-                const itemDate = item.createDate;
-                return itemDate === today;
-            }).length;
-            document.getElementById('todayTemplates').textContent = todayCount;
-        }
-        
-        // Function to populate filters
-        function populateFilters() {
-            if (!dataLoaded) return;
-            
-            // Populate department filter
-            const departmentSelect = document.getElementById('departmentFilter');
-            const departments = new Set(allData.map(item => item.department).filter(Boolean));
-            
-            // Clear existing options except the first one
-            while (departmentSelect.options.length > 1) {
-                departmentSelect.remove(1);
-            }
-            
-            // Add department options
-            departments.forEach(department => {
-                const option = document.createElement('option');
-                option.value = department;
-                option.textContent = department;
-                departmentSelect.appendChild(option);
-            });
-            
-            // Populate section filter
-            const sectionSelect = document.getElementById('sectionFilter');
-            const sections = new Set(allData.map(item => item.section).filter(Boolean));
-            
-            // Clear existing options except the first one
-            while (sectionSelect.options.length > 1) {
-                sectionSelect.remove(1);
-            }
-            
-            // Add section options
-            sections.forEach(section => {
-                const option = document.createElement('option');
-                option.value = section;
-                option.textContent = section;
-                sectionSelect.appendChild(option);
-            });
-        }
-        
-        // Function to apply filters
-        function applyFilters() {
-            if (!dataLoaded) return;
-            
-            const studentId = document.getElementById('studentIdFilter').value.trim();
-            const date = document.getElementById('dateFilter').value;
-            const department = document.getElementById('departmentFilter').value;
-            const section = document.getElementById('sectionFilter').value;
-            
-            // Filter data
-            filteredData = allData.filter(item => {
-                let matchesStudentId = true;
-                let matchesDate = true;
-                let matchesDepartment = true;
-                let matchesSection = true;
-                
-                if (studentId) {
-                    matchesStudentId = item.studentId && item.studentId.toString().includes(studentId);
-                }
-                
-                if (date) {
-                    // Convert date to DD/MM/YYYY format for comparison
-                    const filterDate = new Date(date).toLocaleDateString('en-GB');
-                    matchesDate = item.createDate === filterDate;
-                }
-                
-                if (department) {
-                    matchesDepartment = item.department === department;
-                }
-                
-                if (section) {
-                    matchesSection = item.section === section;
-                }
-                
-                return matchesStudentId && matchesDate && matchesDepartment && matchesSection;
-            });
-            
-            // Update filter summary
-            updateFilterSummary(studentId, date, department, section);
-            
-            // Display results
-            displayResults();
-        }
-        
-        // Function to update filter summary
-        function updateFilterSummary(studentId, date, department, section) {
-            const filterSummary = document.getElementById('filterSummary');
-            const studentCard = document.getElementById('studentTemplatesCard');
-            const departmentCard = document.getElementById('departmentTemplatesCard');
-            const sectionCard = document.getElementById('sectionTemplatesCard');
-            const dateCard = document.getElementById('dateTemplatesCard');
-            
-            // Hide all cards initially
-            studentCard.style.display = 'none';
-            departmentCard.style.display = 'none';
-            sectionCard.style.display = 'none';
-            dateCard.style.display = 'none';
-            
-            let showSummary = false;
-            
-            // Update student card if filtering by student ID
-            if (studentId) {
-                const studentData = allData.filter(item => item.studentId && item.studentId.toString().includes(studentId));
-                if (studentData.length > 0) {
-                    const student = studentData[0];
-                    document.getElementById('displayStudentId').textContent = student.studentId;
-                    document.getElementById('displayStudentName').textContent = student.studentName || 'N/A';
-                    document.getElementById('studentTemplateCount').textContent = studentData.length;
-                    studentCard.style.display = 'block';
-                    showSummary = true;
-                }
-            }
-            
-            // Update department card if filtering by department
-            if (department) {
-                const departmentData = allData.filter(item => item.department === department);
-                document.getElementById('displayDepartment').textContent = department;
-                document.getElementById('departmentTemplateCount').textContent = departmentData.length;
-                departmentCard.style.display = 'block';
-                showSummary = true;
-            }
-            
-            // Update section card if filtering by section
-            if (section) {
-                const sectionData = allData.filter(item => item.section === section);
-                document.getElementById('displaySection').textContent = section;
-                document.getElementById('sectionTemplateCount').textContent = sectionData.length;
-                sectionCard.style.display = 'block';
-                showSummary = true;
-            }
-            
-            // Update date card if filtering by date
-            if (date) {
-                const filterDate = new Date(date).toLocaleDateString('en-GB');
-                const dateData = allData.filter(item => item.createDate === filterDate);
-                document.getElementById('displayDate').textContent = filterDate;
-                document.getElementById('dateTemplateCount').textContent = dateData.length;
-                dateCard.style.display = 'block';
-                showSummary = true;
-            }
-            
-            // Show or hide the summary section
-            filterSummary.style.display = showSummary ? 'block' : 'none';
-        }
-        
-        // Function to reset filters
-        function resetFilters() {
-            document.getElementById('studentIdFilter').value = '';
-            document.getElementById('dateFilter').value = '';
-            document.getElementById('departmentFilter').value = '';
-            document.getElementById('sectionFilter').value = '';
-            document.getElementById('filterSummary').style.display = 'none';
-            
-            if (dataLoaded) {
-                filteredData = [...allData];
-                currentPage = 1;
-                displayResults();
-            }
-        }
-        
-        // Function to display results with pagination
-        function displayResults() {
-            if (!dataLoaded) return;
-            
-            const resultsBody = document.getElementById('resultsBody');
-            const noResults = document.getElementById('noResults');
-            const paginationContainer = document.getElementById('pagination');
-            
-            // Clear previous results
-            resultsBody.innerHTML = '';
-            paginationContainer.innerHTML = '';
-            
-            if (filteredData.length === 0) {
-                noResults.style.display = 'block';
-                document.getElementById('resultsContainer').style.display = 'none';
-                return;
-            }
-            
-            noResults.style.display = 'none';
-            document.getElementById('resultsContainer').style.display = 'block';
-            
-            // Calculate pagination
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            if (currentPage > totalPages) {
-                currentPage = 1;
-            }
-            
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
-            
-            // Display current page data
-            for (let i = startIndex; i < endIndex; i++) {
-                const item = filteredData[i];
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${item.studentId || 'N/A'}</td>
-                    <td>${item.studentName || 'N/A'}</td>
-                    <td>${item.section || 'N/A'}</td>
-                    <td>${item.department || 'N/A'}</td>
-                    <td>${item.courseName || 'N/A'}</td>
-                    <td>${item.teacherName || 'N/A'}</td>
-                    <td>${item.createDate || 'N/A'}</td>
-                `;
-                
-                resultsBody.appendChild(row);
-            }
-            
-            // Create pagination controls
-            if (totalPages > 1) {
-                // Previous button
-                const prevButton = document.createElement('button');
-                prevButton.textContent = '← Previous';
-                prevButton.disabled = currentPage === 1;
-                prevButton.addEventListener('click', () => {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        displayResults();
-                    }
-                });
-                paginationContainer.appendChild(prevButton);
-                
-                // Page buttons
-                const maxButtons = 5;
-                const startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
-                const endPage = Math.min(totalPages, startPage + maxButtons - 1);
-                
-                for (let i = startPage; i <= endPage; i++) {
-                    const pageButton = document.createElement('button');
-                    pageButton.textContent = i;
-                    pageButton.classList.toggle('active', i === currentPage);
-                    pageButton.addEventListener('click', () => {
-                        currentPage = i;
-                        displayResults();
-                    });
-                    paginationContainer.appendChild(pageButton);
-                }
-                
-                // Next button
-                const nextButton = document.createElement('button');
-                nextButton.textContent = 'Next →';
-                nextButton.disabled = currentPage === totalPages;
-                nextButton.addEventListener('click', () => {
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        displayResults();
-                    }
-                });
-                paginationContainer.appendChild(nextButton);
-            }
-        }
-        
-        // Helper functions for loader
-        function showLoader() {
-            document.getElementById('loader').style.display = 'block';
-        }
-        
-        function hideLoader() {
-            document.getElementById('loader').style.display = 'none';
-        }
-        
-        // Event listeners
-        document.getElementById('loadDataBtn').addEventListener('click', () => {
-            tryApisInSequence();
-        });
-        
-        document.getElementById('applyFilterBtn').addEventListener('click', () => {
-            applyFilters();
-        });
-        
-        document.getElementById('resetFilterBtn').addEventListener('click', () => {
-            resetFilters();
-        });
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Don't load data automatically - wait for user to click the button
-            updateApiStatus('Please click "Load Data" to fetch data from the API.');
-        });
-    </script>
+  <script>
+      // SheetDB API endpoints
+      const sheetDbApis = [
+          'https://sheetdb.io/api/v1/j2l9m7ykx1dtt',
+          'https://sheetdb.io/api/v1/5m1omtva8avsk',
+          'https://sheetdb.io/api/v1/61kyqimj66opr',
+          'https://sheetdb.io/api/v1/0lbjvqvqaht7u',
+          'https://sheetdb.io/api/v1/y3v109nzuzvwf',
+          'https://sheetdb.io/api/v1/xut3wtv9lzil4'
+      ];
+      
+      // Global variables
+      let allData = [];
+      let filteredData = [];
+      let currentPage = 1;
+      const rowsPerPage = 10;
+      let currentApiIndex = 0;
+      let dataLoaded = false;
+      
+      // Function to fetch data from a single API
+      async function fetchData(apiIndex) {
+          showLoader();
+          updateApiStatus(`Trying API ${apiIndex + 1}...`);
+          
+          try {
+              const response = await fetch(sheetDbApis[apiIndex]);
+              
+              if (!response.ok) {
+                  throw new Error(`API ${apiIndex + 1} responded with status ${response.status}`);
+              }
+              
+              const data = await response.json();
+              
+              if (!Array.isArray(data) || data.length === 0) {
+                  throw new Error(`API ${apiIndex + 1} returned no data`);
+              }
+              
+              updateApiStatus(`Successfully loaded data from API ${apiIndex + 1}`);
+              return data;
+              
+          } catch (error) {
+              updateApiStatus(`Error with API ${apiIndex + 1}: ${error.message}`, true);
+              throw error;
+          }
+      }
+      
+      // Function to try APIs in sequence
+      async function tryApisInSequence() {
+          showLoader();
+          
+          const apiSelect = document.getElementById('apiSelect');
+          const selectedValue = apiSelect.value;
+          
+          if (selectedValue === 'auto') {
+              // Try each API in sequence
+              for (let i = 0; i < sheetDbApis.length; i++) {
+                  try {
+                      const data = await fetchData(i);
+                      allData = data;
+                      currentApiIndex = i;
+                      dataLoaded = true;
+                      break; // Stop after first successful API
+                  } catch (error) {
+                      console.error(`API ${i + 1} failed:`, error);
+                      // Continue to next API
+                  }
+              }
+              
+              if (!dataLoaded) {
+                  updateApiStatus('All APIs failed. Please try again later.', true);
+              }
+          } else {
+              // Try only the selected API
+              const apiIndex = parseInt(selectedValue);
+              try {
+                  const data = await fetchData(apiIndex);
+                  allData = data;
+                  currentApiIndex = apiIndex;
+                  dataLoaded = true;
+              } catch (error) {
+                  updateApiStatus(`Failed to load data from API ${apiIndex + 1}. Please try another API.`, true);
+              }
+          }
+          
+          if (dataLoaded) {
+              // Update UI with data
+              document.getElementById('noData').style.display = 'none';
+              document.getElementById('resultsContainer').style.display = 'block';
+              
+              // Update stats and filters
+              updateStats();
+              populateFilters();
+              resetFilters();
+              applyFilters();
+          }
+          
+          hideLoader();
+      }
+      
+      // Function to update API status message
+      function updateApiStatus(message, isError = false) {
+          const statusElement = document.getElementById('apiStatus');
+          statusElement.textContent = message;
+          statusElement.className = isError ? 'text-red-600' : 'text-green-600';
+      }
+      
+      // Function to update statistics
+      function updateStats() {
+          if (!dataLoaded) return;
+          
+          // Total templates
+          document.getElementById('totalTemplates').textContent = allData.length;
+          
+          // Unique students
+          const uniqueStudentIds = new Set(allData.map(item => item.studentId).filter(Boolean));
+          document.getElementById('uniqueStudents').textContent = uniqueStudentIds.size;
+          
+          // Templates created today
+          const today = new Date().toLocaleDateString('en-GB'); // DD/MM/YYYY
+          const todayCount = allData.filter(item => {
+              // Handle different date formats
+              const itemDate = item.createDate;
+              return itemDate === today;
+          }).length;
+          document.getElementById('todayTemplates').textContent = todayCount;
+      }
+      
+      // Function to populate filters
+      function populateFilters() {
+          if (!dataLoaded) return;
+          
+          // Populate department filter
+          const departmentSelect = document.getElementById('departmentFilter');
+          const departments = new Set(allData.map(item => item.department).filter(Boolean));
+          
+          // Clear existing options except the first one
+          while (departmentSelect.options.length > 1) {
+              departmentSelect.remove(1);
+          }
+          
+          // Add department options
+          departments.forEach(department => {
+              const option = document.createElement('option');
+              option.value = department;
+              option.textContent = department;
+              departmentSelect.appendChild(option);
+          });
+          
+          // Populate section filter
+          const sectionSelect = document.getElementById('sectionFilter');
+          const sections = new Set(allData.map(item => item.section).filter(Boolean));
+          
+          // Clear existing options except the first one
+          while (sectionSelect.options.length > 1) {
+              sectionSelect.remove(1);
+          }
+          
+          // Add section options
+          sections.forEach(section => {
+              const option = document.createElement('option');
+              option.value = section;
+              option.textContent = section;
+              sectionSelect.appendChild(option);
+          });
+      }
+      
+      // Function to apply filters
+      function applyFilters() {
+          if (!dataLoaded) return;
+          
+          const studentId = document.getElementById('studentIdFilter').value.trim();
+          const date = document.getElementById('dateFilter').value;
+          const department = document.getElementById('departmentFilter').value;
+          const section = document.getElementById('sectionFilter').value;
+          
+          // Filter data
+          filteredData = allData.filter(item => {
+              let matchesStudentId = true;
+              let matchesDate = true;
+              let matchesDepartment = true;
+              let matchesSection = true;
+              
+              if (studentId) {
+                  matchesStudentId = item.studentId && item.studentId.toString().includes(studentId);
+              }
+              
+              if (date) {
+                  // Convert date to DD/MM/YYYY format for comparison
+                  const filterDate = new Date(date).toLocaleDateString('en-GB');
+                  matchesDate = item.createDate === filterDate;
+              }
+              
+              if (department) {
+                  matchesDepartment = item.department === department;
+              }
+              
+              if (section) {
+                  matchesSection = item.section === section;
+              }
+              
+              return matchesStudentId && matchesDate && matchesDepartment && matchesSection;
+          });
+          
+          // Update filter summary
+          updateFilterSummary(studentId, date, department, section);
+          
+          // Display results
+          displayResults();
+      }
+      
+      // Function to update filter summary
+      function updateFilterSummary(studentId, date, department, section) {
+          const filterSummary = document.getElementById('filterSummary');
+          const studentCard = document.getElementById('studentTemplatesCard');
+          const departmentCard = document.getElementById('departmentTemplatesCard');
+          const sectionCard = document.getElementById('sectionTemplatesCard');
+          const dateCard = document.getElementById('dateTemplatesCard');
+          
+          // Hide all cards initially
+          studentCard.style.display = 'none';
+          departmentCard.style.display = 'none';
+          sectionCard.style.display = 'none';
+          dateCard.style.display = 'none';
+          
+          let showSummary = false;
+          
+          // Update student card if filtering by student ID
+          if (studentId) {
+              const studentData = allData.filter(item => item.studentId && item.studentId.toString().includes(studentId));
+              if (studentData.length > 0) {
+                  const student = studentData[0];
+                  document.getElementById('displayStudentId').textContent = student.studentId;
+                  document.getElementById('displayStudentName').textContent = student.studentName || 'N/A';
+                  document.getElementById('studentTemplateCount').textContent = studentData.length;
+                  studentCard.style.display = 'block';
+                  showSummary = true;
+              }
+          }
+          
+          // Update department card if filtering by department
+          if (department) {
+              const departmentData = allData.filter(item => item.department === department);
+              document.getElementById('displayDepartment').textContent = department;
+              document.getElementById('departmentTemplateCount').textContent = departmentData.length;
+              departmentCard.style.display = 'block';
+              showSummary = true;
+          }
+          
+          // Update section card if filtering by section
+          if (section) {
+              const sectionData = allData.filter(item => item.section === section);
+              document.getElementById('displaySection').textContent = section;
+              document.getElementById('sectionTemplateCount').textContent = sectionData.length;
+              sectionCard.style.display = 'block';
+              showSummary = true;
+          }
+          
+          // Update date card if filtering by date
+          if (date) {
+              const filterDate = new Date(date).toLocaleDateString('en-GB');
+              const dateData = allData.filter(item => item.createDate === filterDate);
+              document.getElementById('displayDate').textContent = filterDate;
+              document.getElementById('dateTemplateCount').textContent = dateData.length;
+              dateCard.style.display = 'block';
+              showSummary = true;
+          }
+          
+          // Show or hide the summary section
+          filterSummary.style.display = showSummary ? 'block' : 'none';
+      }
+      
+      // Function to reset filters
+      function resetFilters() {
+          document.getElementById('studentIdFilter').value = '';
+          document.getElementById('dateFilter').value = '';
+          document.getElementById('departmentFilter').value = '';
+          document.getElementById('sectionFilter').value = '';
+          document.getElementById('filterSummary').style.display = 'none';
+          
+          if (dataLoaded) {
+              filteredData = [...allData];
+              currentPage = 1;
+              displayResults();
+          }
+      }
+      
+      // Function to display results with pagination
+      function displayResults() {
+          if (!dataLoaded) return;
+          
+          const resultsBody = document.getElementById('resultsBody');
+          const noResults = document.getElementById('noResults');
+          const paginationContainer = document.getElementById('pagination');
+          
+          // Clear previous results
+          resultsBody.innerHTML = '';
+          paginationContainer.innerHTML = '';
+          
+          if (filteredData.length === 0) {
+              noResults.style.display = 'block';
+              document.getElementById('resultsContainer').style.display = 'none';
+              return;
+          }
+          
+          noResults.style.display = 'none';
+          document.getElementById('resultsContainer').style.display = 'block';
+          
+          // Calculate pagination
+          const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+          if (currentPage > totalPages) {
+              currentPage = 1;
+          }
+          
+          const startIndex = (currentPage - 1) * rowsPerPage;
+          const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+          
+          // Display current page data
+          for (let i = startIndex; i < endIndex; i++) {
+              const item = filteredData[i];
+              const row = document.createElement('tr');
+              
+              row.innerHTML = `
+                  <td>${item.studentId || 'N/A'}</td>
+                  <td>${item.studentName || 'N/A'}</td>
+                  <td>${item.section || 'N/A'}</td>
+                  <td>${item.department || 'N/A'}</td>
+                  <td>${item.courseName || 'N/A'}</td>
+                  <td>${item.teacherName || 'N/A'}</td>
+                  <td>${item.createDate || 'N/A'}</td>
+              `;
+              
+              resultsBody.appendChild(row);
+          }
+          
+          // Create pagination controls
+          if (totalPages > 1) {
+              // Previous button
+              const prevButton = document.createElement('button');
+              prevButton.textContent = '← Previous';
+              prevButton.disabled = currentPage === 1;
+              prevButton.addEventListener('click', () => {
+                  if (currentPage > 1) {
+                      currentPage--;
+                      displayResults();
+                  }
+              });
+              paginationContainer.appendChild(prevButton);
+              
+              // Page buttons
+              const maxButtons = 5;
+              const startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+              const endPage = Math.min(totalPages, startPage + maxButtons - 1);
+              
+              for (let i = startPage; i <= endPage; i++) {
+                  const pageButton = document.createElement('button');
+                  pageButton.textContent = i;
+                  pageButton.classList.toggle('active', i === currentPage);
+                  pageButton.addEventListener('click', () => {
+                      currentPage = i;
+                      displayResults();
+                  });
+                  paginationContainer.appendChild(pageButton);
+              }
+              
+              // Next button
+              const nextButton = document.createElement('button');
+              nextButton.textContent = 'Next →';
+              nextButton.disabled = currentPage === totalPages;
+              nextButton.addEventListener('click', () => {
+                  if (currentPage < totalPages) {
+                      currentPage++;
+                      displayResults();
+                  }
+              });
+              paginationContainer.appendChild(nextButton);
+          }
+      }
+      
+      // Helper functions for loader
+      function showLoader() {
+          document.getElementById('loader').style.display = 'block';
+      }
+      
+      function hideLoader() {
+          document.getElementById('loader').style.display = 'none';
+      }
+      
+      // Event listeners
+      document.getElementById('loadDataBtn').addEventListener('click', () => {
+          tryApisInSequence();
+      });
+      
+      document.getElementById('applyFilterBtn').addEventListener('click', () => {
+          applyFilters();
+      });
+      
+      document.getElementById('resetFilterBtn').addEventListener('click', () => {
+          resetFilters();
+      });
+      
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+    const pin = prompt("Enter PIN to access this page:");
+    if (pin !== "267412") {
+      alert("Wrong PIN. Redirecting...");
+      window.location.href = "index.html";
+    }
+    
+    // Don't load data automatically - wait for user to click the button
+    updateApiStatus('Please click "Load Data" to fetch data from the API.');
+  });
+  </script>
 </body>
 </html>
