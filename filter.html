@@ -110,12 +110,66 @@
           font-weight: 600;
           margin-left: 8px;
       }
+
+      .blocked-student {
+          background-color: #fef2f2;
+          border-left: 4px solid #ef4444;
+      }
+
+      .blocked-badge {
+          background-color: #ef4444;
+          color: white;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 0.75rem;
+          font-weight: 600;
+      }
+
+      .success-message {
+          background-color: #f0f9ff;
+          border: 1px solid #0ea5e9;
+          color: #0c4a6e;
+          padding: 12px;
+          border-radius: 6px;
+          margin: 10px 0;
+      }
+
+      .error-message {
+          background-color: #fef2f2;
+          border: 1px solid #ef4444;
+          color: #991b1b;
+          padding: 12px;
+          border-radius: 6px;
+          margin: 10px 0;
+      }
+
+      .delete-btn {
+          background-color: #ef4444;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.75rem;
+      }
+
+      .delete-btn:hover {
+          background-color: #dc2626;
+      }
+
+      .add-form {
+          background-color: #f8fafc;
+          border: 2px dashed #cbd5e1;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 20px 0;
+      }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
   <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-6">
-          <h1 class="text-3xl font-bold text-gray-800">Cover Page Data Filter</h1>
+          <h1 class="text-3xl font-bold text-gray-800">Cover Page Data Filter & Management</h1>
           <div class="button-wrapper flex space-x-3">
               <a href="index.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                   Back to Generator
@@ -124,6 +178,60 @@
                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" target="_blank">
                   See Block List
               </a>
+          </div>
+      </div>
+
+      <!-- Blocked Students Management Section -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+          <h2 class="text-xl font-semibold mb-4">Blocked Students Management</h2>
+          
+          <!-- Add New Blocked Student -->
+          <div class="add-form">
+              <h3 class="text-lg font-semibold mb-3">Add New Blocked Student</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                      <label for="newStudentName" class="block text-sm font-medium text-gray-700 mb-1">Student Name:</label>
+                      <input type="text" id="newStudentName" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter student name">
+                  </div>
+                  <div>
+                      <label for="newStudentId" class="block text-sm font-medium text-gray-700 mb-1">Student ID:</label>
+                      <input type="text" id="newStudentId" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter student ID">
+                  </div>
+                  <div class="flex items-end">
+                      <button id="addBlockedStudentBtn" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700">
+                          Block Student
+                      </button>
+                  </div>
+              </div>
+              <div id="addStudentMessage" class="mt-3"></div>
+          </div>
+
+          <!-- Current Blocked Students List -->
+          <div>
+              <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-lg font-semibold">Current Blocked Students</h3>
+                  <button id="refreshBlockedListBtn" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                      Refresh List
+                  </button>
+              </div>
+              <div id="blockedStudentsLoader" class="loader"></div>
+              <div id="blockedStudentsList" class="table-container">
+                  <table>
+                      <thead>
+                          <tr>
+                              <th>Student Name</th>
+                              <th>Student ID</th>
+                              <th>Action</th>
+                          </tr>
+                      </thead>
+                      <tbody id="blockedStudentsBody">
+                          <!-- Blocked students will be populated here -->
+                      </tbody>
+                  </table>
+              </div>
+              <div id="noBlockedStudents" class="text-center py-8 text-gray-500" style="display: none;">
+                  No blocked students found.
+              </div>
           </div>
       </div>
       
@@ -152,7 +260,7 @@
       </div>
       
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div class="stats-card">
               <h3 class="text-lg font-semibold text-gray-600">Total Templates</h3>
               <p class="stats-number" id="totalTemplates">0</p>
@@ -164,6 +272,10 @@
           <div class="stats-card">
               <h3 class="text-lg font-semibold text-gray-600">Templates Today</h3>
               <p class="stats-number" id="todayTemplates">0</p>
+          </div>
+          <div class="stats-card">
+              <h3 class="text-lg font-semibold text-gray-600">Blocked Students</h3>
+              <p class="stats-number text-red-600" id="blockedStudents">0</p>
           </div>
       </div>
       
@@ -193,6 +305,14 @@
                       <!-- Will be populated dynamically -->
                   </select>
               </div>
+              <div>
+                  <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+                  <select id="statusFilter" class="w-full p-2 border border-gray-300 rounded">
+                      <option value="">All Students</option>
+                      <option value="blocked">Blocked Students Only</option>
+                      <option value="active">Active Students Only</option>
+                  </select>
+              </div>
           </div>
           <div class="mt-4 flex justify-end">
               <button id="resetFilterBtn" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2">
@@ -215,6 +335,7 @@
                   <p>Student ID: <span id="displayStudentId" class="font-semibold"></span></p>
                   <p>Name: <span id="displayStudentName" class="font-semibold"></span></p>
                   <p>Templates Created: <span id="studentTemplateCount" class="font-semibold text-blue-600"></span></p>
+                  <span id="studentBlockedStatus" class="blocked-badge" style="display: none;">BLOCKED</span>
               </div>
           </div>
           
@@ -267,6 +388,7 @@
                           <th>Course Name</th>
                           <th>Teacher Name</th>
                           <th>Created Date</th>
+                          <th>Status</th>
                       </tr>
                   </thead>
                   <tbody id="resultsBody">
@@ -289,14 +411,197 @@
           'https://sheetdb.io/api/v1/y3v109nzuzvwf',
           'https://sheetdb.io/api/v1/xut3wtv9lzil4'
       ];
+
+      // Blocked students API endpoint
+      const blockedStudentsApiEndpoint = 'https://script.google.com/macros/s/AKfycby6Rgtq0JQ6aeYY0whxxiHMD_jQGy73mqV3jg6nzDponKf65e0r5x93RSCTlPT4ZZsQow/exec';
       
       // Global variables
       let allData = [];
       let filteredData = [];
+      let blockedStudentIds = new Set();
+      let blockedStudentsData = [];
       let currentPage = 1;
       const rowsPerPage = 10;
       let currentApiIndex = 0;
       let dataLoaded = false;
+      
+      // Load blocked student IDs
+      async function loadBlockedStudentIds() {
+          try {
+              showBlockedStudentsLoader();
+              const response = await fetch(blockedStudentsApiEndpoint);
+              if (response.ok) {
+                  const data = await response.json();
+                  if (data.status === "success" && Array.isArray(data.data)) {
+                      blockedStudentIds.clear();
+                      blockedStudentsData = data.data;
+                      data.data.forEach(item => {
+                          if (item.StudentId) {
+                              blockedStudentIds.add(item.StudentId.toString());
+                          }
+                      });
+                      console.log(`Loaded ${blockedStudentIds.size} blocked student IDs`);
+                      displayBlockedStudents();
+                  }
+              }
+          } catch (error) {
+              console.error('Error loading blocked student IDs:', error);
+              showMessage('addStudentMessage', 'Error loading blocked students list', 'error');
+          } finally {
+              hideBlockedStudentsLoader();
+          }
+      }
+
+      // Display blocked students in the management table
+      function displayBlockedStudents() {
+          const tbody = document.getElementById('blockedStudentsBody');
+          const noBlockedStudents = document.getElementById('noBlockedStudents');
+          
+          tbody.innerHTML = '';
+          
+          if (blockedStudentsData.length === 0) {
+              noBlockedStudents.style.display = 'block';
+              document.getElementById('blockedStudentsList').style.display = 'none';
+              return;
+          }
+          
+          noBlockedStudents.style.display = 'none';
+          document.getElementById('blockedStudentsList').style.display = 'block';
+          
+          blockedStudentsData.forEach(student => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                  <td>${student.StudentName || 'N/A'}</td>
+                  <td>${student.StudentId || 'N/A'}</td>
+                  <td>
+                      <button class="delete-btn" onclick="deleteBlockedStudent('${student.StudentId}', '${student.StudentName}')">
+                          Delete
+                      </button>
+                  </td>
+              `;
+              tbody.appendChild(row);
+          });
+      }
+
+      // Add new blocked student
+      async function addBlockedStudent() {
+          const studentName = document.getElementById('newStudentName').value.trim();
+          const studentId = document.getElementById('newStudentId').value.trim();
+          
+          if (!studentName || !studentId) {
+              showMessage('addStudentMessage', 'Please enter both student name and ID', 'error');
+              return;
+          }
+          
+          // Check if student is already blocked
+          if (blockedStudentIds.has(studentId)) {
+              showMessage('addStudentMessage', 'This student is already blocked', 'error');
+              return;
+          }
+          
+          try {
+              const response = await fetch(blockedStudentsApiEndpoint, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                      action: 'add',
+                      StudentName: studentName,
+                      StudentId: studentId
+                  })
+              });
+              
+              const result = await response.json();
+              
+              if (result.status === 'success') {
+                  showMessage('addStudentMessage', `Student ${studentName} (${studentId}) has been blocked successfully`, 'success');
+                  
+                  // Clear form
+                  document.getElementById('newStudentName').value = '';
+                  document.getElementById('newStudentId').value = '';
+                  
+                  // Refresh the blocked students list
+                  await loadBlockedStudentIds();
+                  
+                  // Update stats if data is loaded
+                  if (dataLoaded) {
+                      updateStats();
+                  }
+              } else {
+                  showMessage('addStudentMessage', result.message || 'Failed to block student', 'error');
+              }
+          } catch (error) {
+              console.error('Error adding blocked student:', error);
+              showMessage('addStudentMessage', 'Error occurred while blocking student', 'error');
+          }
+      }
+
+      // Delete blocked student
+      async function deleteBlockedStudent(studentId, studentName) {
+          if (!confirm(`Are you sure you want to unblock ${studentName} (${studentId})?`)) {
+              return;
+          }
+          
+          try {
+              const response = await fetch(blockedStudentsApiEndpoint, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                      action: 'delete',
+                      StudentId: studentId
+                  })
+              });
+              
+              const result = await response.json();
+              
+              if (result.status === 'success') {
+                  showMessage('addStudentMessage', `Student ${studentName} (${studentId}) has been unblocked successfully`, 'success');
+                  
+                  // Refresh the blocked students list
+                  await loadBlockedStudentIds();
+                  
+                  // Update stats if data is loaded
+                  if (dataLoaded) {
+                      updateStats();
+                      applyFilters(); // Refresh the main results table
+                  }
+              } else {
+                  showMessage('addStudentMessage', result.message || 'Failed to unblock student', 'error');
+              }
+          } catch (error) {
+              console.error('Error deleting blocked student:', error);
+              showMessage('addStudentMessage', 'Error occurred while unblocking student', 'error');
+          }
+      }
+
+      // Show message helper function
+      function showMessage(elementId, message, type) {
+          const element = document.getElementById(elementId);
+          element.innerHTML = `<div class="${type}-message">${message}</div>`;
+          
+          // Clear message after 5 seconds
+          setTimeout(() => {
+              element.innerHTML = '';
+          }, 5000);
+      }
+
+      // Show/hide blocked students loader
+      function showBlockedStudentsLoader() {
+          document.getElementById('blockedStudentsLoader').style.display = 'block';
+      }
+
+      function hideBlockedStudentsLoader() {
+          document.getElementById('blockedStudentsLoader').style.display = 'none';
+      }
+      
+      // Check if a student ID is blocked
+      function isStudentBlocked(studentId) {
+          if (!studentId) return false;
+          return blockedStudentIds.has(studentId.toString());
+      }
       
       // Function to fetch data from a single API
       async function fetchData(apiIndex) {
@@ -328,6 +633,9 @@
       // Function to try APIs in sequence
       async function tryApisInSequence() {
           showLoader();
+          
+          // Load blocked student IDs first
+          await loadBlockedStudentIds();
           
           const apiSelect = document.getElementById('apiSelect');
           const selectedValue = apiSelect.value;
@@ -399,11 +707,19 @@
           // Templates created today
           const today = new Date().toLocaleDateString('en-GB'); // DD/MM/YYYY
           const todayCount = allData.filter(item => {
-              // Handle different date formats
               const itemDate = item.createDate;
               return itemDate === today;
           }).length;
           document.getElementById('todayTemplates').textContent = todayCount;
+          
+          // Blocked students count
+          const blockedStudentsInData = new Set();
+          allData.forEach(item => {
+              if (item.studentId && isStudentBlocked(item.studentId)) {
+                  blockedStudentsInData.add(item.studentId);
+              }
+          });
+          document.getElementById('blockedStudents').textContent = blockedStudentsInData.size;
       }
       
       // Function to populate filters
@@ -453,6 +769,7 @@
           const date = document.getElementById('dateFilter').value;
           const department = document.getElementById('departmentFilter').value;
           const section = document.getElementById('sectionFilter').value;
+          const status = document.getElementById('statusFilter').value;
           
           // Filter data
           filteredData = allData.filter(item => {
@@ -460,6 +777,7 @@
               let matchesDate = true;
               let matchesDepartment = true;
               let matchesSection = true;
+              let matchesStatus = true;
               
               if (studentId) {
                   matchesStudentId = item.studentId && item.studentId.toString().includes(studentId);
@@ -479,7 +797,16 @@
                   matchesSection = item.section === section;
               }
               
-              return matchesStudentId && matchesDate && matchesDepartment && matchesSection;
+              if (status) {
+                  const isBlocked = isStudentBlocked(item.studentId);
+                  if (status === 'blocked') {
+                      matchesStatus = isBlocked;
+                  } else if (status === 'active') {
+                      matchesStatus = !isBlocked;
+                  }
+              }
+              
+              return matchesStudentId && matchesDate && matchesDepartment && matchesSection && matchesStatus;
           });
           
           // Update filter summary
@@ -513,6 +840,15 @@
                   document.getElementById('displayStudentId').textContent = student.studentId;
                   document.getElementById('displayStudentName').textContent = student.studentName || 'N/A';
                   document.getElementById('studentTemplateCount').textContent = studentData.length;
+                  
+                  // Show blocked status
+                  const blockedStatus = document.getElementById('studentBlockedStatus');
+                  if (isStudentBlocked(student.studentId)) {
+                      blockedStatus.style.display = 'inline';
+                  } else {
+                      blockedStatus.style.display = 'none';
+                  }
+                  
                   studentCard.style.display = 'block';
                   showSummary = true;
               }
@@ -556,6 +892,7 @@
           document.getElementById('dateFilter').value = '';
           document.getElementById('departmentFilter').value = '';
           document.getElementById('sectionFilter').value = '';
+          document.getElementById('statusFilter').value = '';
           document.getElementById('filterSummary').style.display = 'none';
           
           if (dataLoaded) {
@@ -600,6 +937,12 @@
               const item = filteredData[i];
               const row = document.createElement('tr');
               
+              // Check if student is blocked
+              const isBlocked = isStudentBlocked(item.studentId);
+              if (isBlocked) {
+                  row.classList.add('blocked-student');
+              }
+              
               row.innerHTML = `
                   <td>${item.studentId || 'N/A'}</td>
                   <td>${item.studentName || 'N/A'}</td>
@@ -608,6 +951,7 @@
                   <td>${item.courseName || 'N/A'}</td>
                   <td>${item.teacherName || 'N/A'}</td>
                   <td>${item.createDate || 'N/A'}</td>
+                  <td>${isBlocked ? '<span class="blocked-badge">BLOCKED</span>' : '<span class="text-green-600 font-semibold">Active</span>'}</td>
               `;
               
               resultsBody.appendChild(row);
@@ -678,18 +1022,43 @@
       document.getElementById('resetFilterBtn').addEventListener('click', () => {
           resetFilters();
       });
+
+      // Blocked students management event listeners
+      document.getElementById('addBlockedStudentBtn').addEventListener('click', () => {
+          addBlockedStudent();
+      });
+
+      document.getElementById('refreshBlockedListBtn').addEventListener('click', () => {
+          loadBlockedStudentIds();
+      });
+
+      // Enter key support for adding blocked students
+      document.getElementById('newStudentId').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+              addBlockedStudent();
+          }
+      });
+
+      document.getElementById('newStudentName').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+              addBlockedStudent();
+          }
+      });
       
       // Initialize
       document.addEventListener('DOMContentLoaded', () => {
-    const pin = prompt("Enter PIN to access this page:");
-    if (pin !== "267412") {
-      alert("Wrong PIN. Redirecting...");
-      window.location.href = "index.html";
-    }
-    
-    // Don't load data automatically - wait for user to click the button
-    updateApiStatus('Please click "Load Data" to fetch data from the API.');
-  });
+          const pin = prompt("Enter PIN to access this page:");
+          if (pin !== "267412") {
+              alert("Wrong PIN. Redirecting...");
+              window.location.href = "index.html";
+          }
+          
+          // Load blocked students list on page load
+          loadBlockedStudentIds();
+          
+          // Don't load data automatically - wait for user to click the button
+          updateApiStatus('Please click "Load Data" to fetch data from the API.');
+      });
   </script>
 </body>
 </html>

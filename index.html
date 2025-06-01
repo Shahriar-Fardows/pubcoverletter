@@ -55,7 +55,7 @@
               height: 100%;
           }
           .page-content {
-              border: 2px dashed #9ca3af !important; /* Keep the border visible when printing */
+              border: 2px dashed #9ca3af !important;
               margin: 8mm !important;
               height: calc(100% - 16mm) !important;
               width: calc(100% - 16mm) !important;
@@ -71,6 +71,21 @@
       .form-container {
           max-width: 210mm;
           margin: 2rem auto;
+      }
+
+      .print-button-disabled {
+          background-color: #9ca3af !important;
+          cursor: not-allowed !important;
+      }
+
+      .student-id-error {
+          border-color: #ef4444 !important;
+          background-color: #fef2f2 !important;
+      }
+
+      .validation-message {
+          font-size: 0.875rem;
+          margin-top: 0.25rem;
       }
   </style>
 </head>
@@ -160,8 +175,9 @@
               <input type="text" id="studentName" class="w-full p-2 border border-gray-300 rounded">
           </div>
           <div>
-              <label for="studentId" class="block text-sm font-medium text-gray-700 mb-1">Student ID:</label>
-              <input type="text" id="studentId" class="w-full p-2 border border-gray-300 rounded">
+              <label for="studentId" class="block text-sm font-medium text-gray-700 mb-1">Student ID: <span class="text-red-500">*</span></label>
+              <input type="text" id="studentId" class="w-full p-2 border border-gray-300 rounded" required>
+              <div id="studentIdValidation" class="validation-message hidden"></div>
           </div>
           <div>
               <label for="section" class="block text-sm font-medium text-gray-700 mb-1">Section:</label>
@@ -185,7 +201,7 @@
               <button type="button" id="previewButton" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
                   Preview
               </button>
-              <button type="button" id="printButton" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+              <button type="button" id="printButton" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 print-button-disabled" disabled>
                   Print Cover Page
               </button>
           </div>
@@ -199,15 +215,18 @@
               <!-- Previous top and middle sections remain same -->
               <div class="space-y-8">
                   <!-- University Logo -->
-                  <div class="flex justify-center">
+                  <div>
+                    <div class="flex justify-center">
                       <img src="./logo.svg" 
                            alt="Presidency University Logo" 
-                           class="h-40 object-contain">
+                           class="h-40 object-contain">     
+                  </div>
+                  <h1 class="text-3xl font-bold text-center text-[#9e1d21]">Presidency <span class="text-[#18457b]"> University</span></h1>
                   </div>
 
                   <!-- Assignment Title - Now using dynamic content -->
                   <div class="text-center">
-                      <h1 class="text-3xl font-bold underline" id="displayAssignmentTitle">ASSIGNMENT</h1>
+                      <h1 class="text-3xl underline" id="displayAssignmentTitle">ASSIGNMENT</h1>
                   </div>
 
                   <!-- Course Information -->
@@ -256,7 +275,7 @@
           mobileMenu.classList.toggle('hidden');
       });
       
-      // SheetDB API endpoints
+      // SheetDB API endpoints for data saving
       const sheetDbApis = [
           'https://sheetdb.io/api/v1/5m1omtva8avsk',
           'https://sheetdb.io/api/v1/61kyqimj66opr',
@@ -264,9 +283,27 @@
           'https://sheetdb.io/api/v1/y3v109nzuzvwf',
           'https://sheetdb.io/api/v1/xut3wtv9lzil4'
       ];
+
+      // Blocked Students API - এই API থেকে banned IDs আসবে
+      const blockedStudentsApi = 'https://sheetdb.io/api/v1/p4r5sob7dibm1';
       
       // API usage tracking
       let apiUsageCounts = {};
+      
+      // Blocked students cache system - API calls কম করার জন্য
+      let blockedStudentsCache = {
+          data: new Set(),
+          lastFetched: null,
+          cacheExpiry: 30 * 60 * 1000, // 30 minutes cache
+          isLoading: false
+      };
+      
+      // Validation state management
+      let validationState = {
+          isValidating: false,
+          lastValidatedId: null,
+          isValid: false
+      };
       
       // Initialize API usage from localStorage if available
       function initializeApiUsage() {
@@ -307,33 +344,166 @@
           saveApiUsage();
       }
       
-      // Reset API usage counts (e.g., at the beginning of a new month)
-      function resetApiUsage() {
-          sheetDbApis.forEach(api => {
-              apiUsageCounts[api] = 0;
-          });
-          saveApiUsage();
-      }
-      
       // Function to log errors silently (only to console)
       function logError(message, error) {
           console.error(`[${new Date().toISOString()}] ${message}`, error);
+      }
+
+      // Load blocked students from API with caching
+      async function loadBlockedStudents() {
+          const now = Date.now();
           
-          // Store errors in localStorage for debugging
-          const errors = JSON.parse(localStorage.getItem('sheetDbErrors') || '[]');
-          errors.push({
-              timestamp: new Date().toISOString(),
-              message: message,
-              error: error.toString(),
-              details: error.stack || 'No stack trace'
-          });
+          // Check if cache is still valid
+          if (blockedStudentsCache.lastFetched && 
+              (now - blockedStudentsCache.lastFetched) < blockedStudentsCache.cacheExpiry) {
+              console.log('Using cached blocked students data');
+              return true;
+          }
+
+          // Prevent multiple simultaneous API calls
+          if (blockedStudentsCache.isLoading) {
+              console.log('Already loading blocked students...');
+              return false;
+          }
+
+          try {
+              blockedStudentsCache.isLoading = true;
+              console.log('Fetching blocked students from API...');
+              
+              const response = await fetch(blockedStudentsApi);
+              
+              if (!response.ok) {
+                  throw new Error(`API responded with status ${response.status}`);
+              }
+              
+              const data = await response.json();
+              
+              // Clear previous cache
+              blockedStudentsCache.data.clear();
+              
+              // Process the data - assuming it's an array of objects with studentId field
+              if (Array.isArray(data)) {
+                  data.forEach(item => {
+                      // Check different possible field names for student ID
+                      const studentId = item.studentId || item.StudentId || item.student_id || item.id;
+                      if (studentId) {
+                          blockedStudentsCache.data.add(studentId.toString().trim());
+                      }
+                  });
+              }
+              
+              // Update cache timestamp
+              blockedStudentsCache.lastFetched = now;
+              
+              console.log(`Loaded ${blockedStudentsCache.data.size} blocked student IDs`);
+              return true;
+              
+          } catch (error) {
+              logError('Error loading blocked students', error);
+              return false;
+          } finally {
+              blockedStudentsCache.isLoading = false;
+          }
+      }
+
+      // Check if a student ID is blocked
+      function isStudentBlocked(studentId) {
+          if (!studentId) return false;
           
-          // Keep only the last 10 errors
-          if (errors.length > 10) {
-              errors.shift();
+          const trimmedId = studentId.toString().trim();
+          return blockedStudentsCache.data.has(trimmedId);
+      }
+
+      // Enhanced student ID validation
+      async function validateStudentAccess(studentId) {
+          if (!studentId || studentId.trim().length === 0) {
+              return { valid: false, message: 'Student ID is required' };
           }
           
-          localStorage.setItem('sheetDbErrors', JSON.stringify(errors));
+          const trimmedId = studentId.trim();
+          
+          // Basic format validation
+          const formatCheck = /^\d{6,12}$/.test(trimmedId);
+          if (!formatCheck) {
+              return { valid: false, message: 'Invalid Student ID format (6-12 digits required)' };
+          }
+
+          // Load blocked students if not already loaded or cache expired
+          await loadBlockedStudents();
+          
+          // Check if student is blocked
+          const isBlocked = isStudentBlocked(trimmedId);
+          
+          if (isBlocked) {
+              return { 
+                  valid: false, 
+                  message: 'Access denied: This Student ID has been restricted from using this service' 
+              };
+          }
+          
+          return { 
+              valid: true, 
+              message: 'Valid Student ID' 
+          };
+      }
+      
+      // Update UI based on validation result
+      function updateValidationUI(result, studentId) {
+          const studentIdInput = document.getElementById('studentId');
+          const validationMessage = document.getElementById('studentIdValidation');
+          const printButton = document.getElementById('printButton');
+          
+          // Clear previous states
+          studentIdInput.classList.remove('student-id-error');
+          validationMessage.classList.add('hidden');
+          validationMessage.classList.remove('text-red-600', 'text-green-600');
+          
+          if (studentId && studentId.trim().length > 0) {
+              if (result.valid) {
+                  validationMessage.textContent = '✓ Valid Student ID';
+                  validationMessage.classList.remove('hidden');
+                  validationMessage.classList.add('text-green-600');
+                  
+                  // Enable print button
+                  printButton.disabled = false;
+                  printButton.classList.remove('print-button-disabled');
+                  
+                  validationState.isValid = true;
+              } else {
+                  studentIdInput.classList.add('student-id-error');
+                  validationMessage.textContent = result.message;
+                  validationMessage.classList.remove('hidden');
+                  validationMessage.classList.add('text-red-600');
+                  
+                  // Disable print button
+                  printButton.disabled = true;
+                  printButton.classList.add('print-button-disabled');
+                  
+                  validationState.isValid = false;
+              }
+          } else {
+              // No student ID entered
+              printButton.disabled = true;
+              printButton.classList.add('print-button-disabled');
+              validationState.isValid = false;
+          }
+          
+          validationState.lastValidatedId = studentId;
+      }
+      
+      // Debounced validation function - API calls কম করার জন্য
+      let validationTimeout;
+      async function debouncedValidation(studentId) {
+          clearTimeout(validationTimeout);
+          
+          validationTimeout = setTimeout(async () => {
+              if (validationState.isValidating) return;
+              
+              validationState.isValidating = true;
+              const result = await validateStudentAccess(studentId);
+              updateValidationUI(result, studentId);
+              validationState.isValidating = false;
+          }, 800); // 800ms delay - user typing শেষ হওয়ার পর check করবে
       }
       
       // Function to save data to Google Sheets via SheetDB
@@ -347,24 +517,20 @@
               const courseName = document.getElementById('courseName').value;
               const teacherName = document.getElementById('teacherName').value;
               
-              // Create data object - FIXED: using studentName instead of name
+              // Create data object
               const data = {
                   assignmentTitle: assignmentTitle || 'ASSIGNMENT',
                   studentId: studentId || 'Not provided',
-                  studentName: studentName || 'Not provided', // Changed from 'name' to 'studentName'
+                  studentName: studentName || 'Not provided',
                   section: section || 'Not provided',
                   department: department || 'Computer Science and Engineering',
                   courseName: courseName || 'Not provided',
                   teacherName: teacherName || 'Not provided',
-                  createDate: new Date().toLocaleDateString('en-GB') // Format as DD/MM/YYYY
+                  createDate: new Date().toLocaleDateString('en-GB')
               };
               
               // Get next available API
               const apiEndpoint = getNextAvailableApi();
-              
-              // Log the API being used and data being sent (for debugging)
-              console.log(`Using API: ${apiEndpoint}`);
-              console.log('Sending data:', data);
               
               // Send data to SheetDB (don't await the response)
               fetch(apiEndpoint, {
@@ -376,7 +542,6 @@
               })
               .then(response => {
                   if (response.ok) {
-                      // Increment API usage
                       incrementApiUsage(apiEndpoint);
                       console.log('Data saved successfully!');
                       return response.json();
@@ -486,9 +651,15 @@
           });
       });
 
+      // Student ID specific validation
+      document.getElementById('studentId').addEventListener('input', function() {
+          const studentId = this.value.trim();
+          debouncedValidation(studentId);
+          updatePreview();
+      });
+
       // Preview button functionality with analytics
       document.getElementById('previewButton').addEventListener('click', function() {
-          // Track preview button click
           gtag('event', 'preview_cover_page', {
               'event_category': 'engagement',
               'event_label': 'Preview Cover Page'
@@ -497,87 +668,40 @@
           document.getElementById('coverPagePreview').scrollIntoView({ behavior: 'smooth' });
       });
 
-      // Change 1: Student ID Block System - Add API call before form submission
-      // Add this code right before the print button click event listener
-      
-      // Replace the existing checkStudentIdBlocked function with this updated version
-      // that handles the specific API response format
-
-      // Function to check if student ID is blocked
-      async function checkStudentIdBlocked(studentId) {
-        try {
-          const response = await fetch('https://script.google.com/macros/s/AKfycby6Rgtq0JQ6aeYY0whxxiHMD_jQGy73mqV3jg6nzDponKf65e0r5x93RSCTlPT4ZZsQow/exec');
-          if (response.ok) {
-            const responseData = await response.json();
-            
-            // Check if the API response has the expected structure
-            if (responseData.status === "success" && Array.isArray(responseData.data)) {
-              // Check if any student in the data array has a matching StudentId
-              return responseData.data.some(student => 
-                student.StudentId && student.StudentId.toString() === studentId.toString()
-              );
-            }
-            return false;
-          }
-          return false;
-        } catch (error) {
-          console.error('Error checking student ID:', error);
-          return false;
-        }
-      }
-      
-      // Function to disable all form fields
-      function disableAllFormFields(disable) {
-        // Disable all input fields
-        document.querySelectorAll('#coverPageForm input, #coverPageForm select, #coverPageForm textarea').forEach(field => {
-          field.disabled = disable;
-        });
-        
-        // Disable buttons
-        document.getElementById('printButton').disabled = disable;
-        document.getElementById('previewButton').disabled = disable;
-      }
-      
-      // Add event listener to student ID field to check for blocked IDs automatically
-      document.getElementById('studentId').addEventListener('blur', async function() {
-        const studentId = this.value.trim();
-        if (studentId) {
-          const isBlocked = await checkStudentIdBlocked(studentId);
-          if (isBlocked) {
-            disableAllFormFields(true);
-          } else {
-            disableAllFormFields(false);
-          }
-        }
-      });
-      
-      // Modify the print button functionality to check for blocked IDs
+      // Enhanced print button functionality
       document.getElementById('printButton').addEventListener('click', async function() {
-        const studentId = document.getElementById('studentId').value.trim();
-        
-        // Check if student ID is blocked
-        if (studentId) {
-          const isBlocked = await checkStudentIdBlocked(studentId);
-          
-          if (isBlocked) {
-            disableAllFormFields(true);
-            return;
+          // Prevent action if button is disabled
+          if (this.disabled) {
+              return;
           }
-        }
-        
-        // If not blocked, continue with normal functionality
-        saveToGoogleSheets();
-        
-        gtag('event', 'generate_cover_page', {
-          'event_category': 'conversion',
-          'event_label': 'Print Cover Page'
-        });
-        
-        window.print();
+          
+          const studentId = document.getElementById('studentId').value.trim();
+          
+          // Final validation before printing
+          if (!studentId) {
+              alert('Please enter a valid Student ID before printing.');
+              return;
+          }
+          
+          // Double-check validation state
+          if (!validationState.isValid || validationState.lastValidatedId !== studentId) {
+              const result = await validateStudentAccess(studentId);
+              if (!result.valid) {
+                  alert('Cannot print: ' + result.message);
+                  return;
+              }
+          }
+          
+          // Save data and print
+          saveToGoogleSheets();
+          
+          gtag('event', 'generate_cover_page', {
+              'event_category': 'conversion',
+              'event_label': 'Print Cover Page'
+          });
+          
+          window.print();
       });
-      
-      // Print button functionality with analytics and silent data saving
-      
 
       // Set today's date as default
       const today = new Date();
@@ -594,34 +718,19 @@
       // Initialize API usage tracking
       initializeApiUsage();
       
-      // Check if it's a new month to reset API usage
-      function checkAndResetMonthlyUsage() {
-          const lastResetDate = localStorage.getItem('lastApiResetDate');
-          const currentDate = new Date();
-          const currentMonth = currentDate.getMonth();
-          const currentYear = currentDate.getFullYear();
-          
-          if (lastResetDate) {
-              const resetDate = new Date(lastResetDate);
-              const resetMonth = resetDate.getMonth();
-              const resetYear = resetDate.getFullYear();
-              
-              // If it's a new month, reset the API usage
-              if (currentMonth !== resetMonth || currentYear !== resetYear) {
-                  resetApiUsage();
-                  localStorage.setItem('lastApiResetDate', currentDate.toISOString());
-              }
-          } else {
-              // First time running, set the reset date
-              localStorage.setItem('lastApiResetDate', currentDate.toISOString());
-          }
-      }
-      
-      // Check for monthly reset on page load
-      checkAndResetMonthlyUsage();
-      
       // Initial update
       updatePreview();
+      
+      // Initialize print button state
+      updateValidationUI({ valid: false, message: 'Student ID required' }, '');
+
+      // Pre-load blocked students on page load (background loading)
+      document.addEventListener('DOMContentLoaded', () => {
+          // Load blocked students in background without blocking UI
+          loadBlockedStudents().catch(error => {
+              console.log('Failed to pre-load blocked students:', error);
+          });
+      });
   </script>
 </body>
 </html>
