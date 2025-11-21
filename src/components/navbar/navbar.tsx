@@ -23,6 +23,7 @@ export function Navbar({
     { label: "Cover Page", href: "/" },
     { label: "Resume Builder", href: "/resume-builder" },
     { label: "Web Share", href: "/web-share" },
+    { label: "AI Resume Analyzer", href: "/ai-resume-analyzer" },
   ]
 }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -53,7 +54,7 @@ export function Navbar({
 
           {/* Desktop Contact Button */}
 <div className="hidden md:flex items-center gap-4">
-  <Link href="/feedback">
+  <Link href="/feed-back">
     <Button
       className="bg-[#9e1d21] text-white text-[18px] px-10 py-5 rounded-md shadow-sm hover:bg-[#82171a] transition"
     >
@@ -100,7 +101,7 @@ export function Navbar({
 
         {/* Contact Button */}
         <div className="border-t border-gray-200 px-2 py-12">
-            <Link href="/feedback">
+            <Link href="/feed-back">
             <Button
             className="w-full bg-[#9e1d21] text-white hover:bg-[#82171a]"
           >
