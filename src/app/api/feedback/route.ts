@@ -11,6 +11,20 @@ type FeedbackBody = {
   honeypot?: string;
 };
 
+// Generate random challenge
+function generateChallenge() {
+  const a = Math.floor(Math.random() * 10) + 1; // 1-10
+  const b = Math.floor(Math.random() * 10) + 1; // 1-10
+  return { a, b };
+}
+
+// GET endpoint to fetch a new challenge
+export async function GET() {
+  const challenge = generateChallenge();
+  return NextResponse.json(challenge, { status: 200 });
+}
+
+// POST endpoint to verify feedback
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as FeedbackBody;

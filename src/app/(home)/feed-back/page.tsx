@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
 type Challenge = {
@@ -8,17 +8,57 @@ type Challenge = {
   b: number;
 };
 
-const STATIC_CHALLENGE: Challenge = {
-  a: 4,
-  b: 7,
-};
-
 const FeedbackPage: React.FC = () => {
-  // Static challenge – same on server & client, no random, no hydration issue
-  const [challenge] = useState<Challenge>(STATIC_CHALLENGE);
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch random challenge on component mount
+  useEffect(() => {
+    const fetchChallenge = async () => {
+      try {
+        const res = await fetch("/api/feedback");
+        if (res.ok) {
+          const data = await res.json();
+          setChallenge(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch challenge:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to load verification challenge.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChallenge();
+  }, []);
+
+  const handleRefreshChallenge = async () => {
+    try {
+      const res = await fetch("/api/feedback");
+      if (res.ok) {
+        const data = await res.json();
+        setChallenge(data);
+      }
+    } catch (error) {
+      console.error("Failed to refresh challenge:", error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!challenge) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Challenge not loaded. Please refresh.",
+      });
+      return;
+    }
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -68,7 +108,8 @@ const FeedbackPage: React.FC = () => {
           text: "Your feedback has been submitted successfully.",
         });
         form.reset();
-        // Static challenge, tai abar change korar dorkar nai
+        // Fetch new challenge after successful submission
+        await handleRefreshChallenge();
       } else {
         const data = await res.json().catch(() => ({}));
         Swal.fire({
@@ -85,6 +126,22 @@ const FeedbackPage: React.FC = () => {
       });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] container mx-auto flex items-center justify-center">
+        <p className="text-gray-600">Loading form...</p>
+      </div>
+    );
+  }
+
+  if (!challenge) {
+    return (
+      <div className="min-h-[70vh] container mx-auto flex items-center justify-center">
+        <p className="text-red-600">Failed to load verification challenge.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[70vh] container mx-auto flex items-center justify-center">
@@ -163,9 +220,13 @@ const FeedbackPage: React.FC = () => {
                 </p>
               </div>
               <div className="w-1/3 flex justify-end">
-                <span className="inline-flex items-center rounded-full border border-gray-300 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-600">
-                Anti-spam
-              </span>
+                <button
+                  type="button"
+                  onClick={handleRefreshChallenge}
+                  className="inline-flex items-center rounded-full border border-gray-300 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  🔄 Refresh
+                </button>
               </div>
             </div>
 
