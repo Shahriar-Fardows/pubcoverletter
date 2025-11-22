@@ -147,7 +147,7 @@ const FeedbackPage: React.FC = () => {
     <div className="min-h-[70vh] container mx-auto flex items-center justify-center">
       <div className="w-full max-w-3xl p-8">
         <h1 className="text-2xl font-semibold text-black mb-2">
-          Feedback Form
+          Feedback
         </h1>
         <p className="text-sm text-gray-600 mb-6">
           Tell us what you think. Your feedback helps us improve.

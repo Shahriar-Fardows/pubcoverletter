@@ -1,234 +1,248 @@
-const CoverForm = () => {
-  return (
-    <section className="min-h-[70vh] w-full bg-slate-50 py-10">
-      <div className="mx-auto w-full max-w-3xl px-4">
-        {/* Header */}
-        <div className="mb-6 flex flex-col gap-2">
-          <span className="inline-flex w-fit items-center rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
-            Cover Page Builder
-          </span>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Assignment Cover Details
-          </h1>
-          <p className="max-w-xl text-sm text-slate-600">
-            Fill in the information below. These details will be used to generate
-            a clean, printable cover page for your assignment.
-          </p>
-        </div>
+"use client"
 
-        {/* Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <form className="space-y-6">
-            {/* Cover Title */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="coverTitle"
-                className="block text-sm font-medium text-slate-900"
-              >
-                Cover Title
+import type React from "react"
+import { Upload, FileUp, RotateCcw } from "lucide-react"
+import type { CoverFormValues } from "@/components/cover-form/typs"
+
+type CoverFormProps = {
+  onGenerate: (data: CoverFormValues) => void
+}
+
+const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const formData = new FormData(e.currentTarget)
+
+    const logoFile = formData.get("logo") as File | null
+    const coverTitle = (formData.get("cover_title") as string) || ""
+    const courseName = (formData.get("course_name") as string) || ""
+    const courseCode = (formData.get("course_code") as string) || ""
+    const studentName = (formData.get("student_name") as string) || ""
+    const studentID = (formData.get("student_id") as string) || ""
+    const submissionDate = (formData.get("submission_date") as string) || ""
+    const sectionBatch = (formData.get("section_batch") as string) || ""
+    const teacherName = (formData.get("teacher_name") as string) || ""
+    const teacherPosition = (formData.get("teacher_position") as string) || ""
+    const department = (formData.get("department") as string) || ""
+    const universityName = (formData.get("university_name") as string) || ""
+
+    // Create preview URL from file
+    let logoUrl: string | null = null
+    if (logoFile && logoFile.size > 0) {
+      logoUrl = URL.createObjectURL(logoFile)
+    }
+
+    const data: CoverFormValues = {
+      logoFile,
+      logoUrl,
+      coverTitle,
+      courseName,
+      courseCode,
+      studentName,
+      studentID,
+      submissionDate,
+      sectionBatch,
+      teacherName,
+      teacherPosition,
+      department,
+      universityName,
+    }
+
+    onGenerate(data)
+  }
+
+  const handleReset = () => {
+    const form = document.querySelector("form") as HTMLFormElement
+    if (form) form.reset()
+  }
+
+  return (
+    <div className="min-h-screen px-4">
+      <div className="mx-auto">
+        <div className="bg-[#f8f9fa] backdrop-blur-sm rounded-[2px] border border-zinc-200">
+          <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-8">
+            {/* Logo Upload Section */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold text-zinc-800">Institute / University Logo</h3>
+              <p className="text-xs text-zinc-500">Optional.</p>
+
+              <label className="py-4 group relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 px-4 py-10 text-center transition hover:border-zinc-600 hover:bg-zinc-100 cursor-pointer">
+                <Upload className="mb-3 h-10 w-10 text-zinc-600 group-hover:scale-105 transition-transform" />
+                <p className="text-sm font-semibold text-zinc-800">Upload Logo</p>
+                <p className="mt-1 text-xs text-zinc-500">Drag & drop or click to browse • PNG / JPG up to 10MB</p>
+                <span className="mt-4 inline-flex items-center rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition group-hover:bg-black">
+                  Choose File
+                </span>
+                <input
+                  type="file"
+                  name="logo"
+                  accept="image/png, image/jpeg"
+                  className="hidden"
+                  aria-label="Upload logo"
+                />
               </label>
+            </section>
+
+            {/* University name  */}
+            <section className="space-y-2">
+              <label className="block text-sm font-semibold text-zinc-800">University Name</label>
               <input
                 type="text"
-                id="coverTitle"
-                name="coverTitle"
-                placeholder="Assignment"
-                required
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                name="university_name"
+                placeholder="Presidency University of Bangladesh"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
               />
-              <p className="text-xs text-slate-500">
-                This text will appear as the main title on your cover page.
-              </p>
-            </div>
+              <p className="text-xs text-zinc-500">This will appear as the main heading on your cover page.</p>
+            </section>
+            {/* Cover Title */}
+            <section className="space-y-2">
+              <label className="block text-sm font-semibold text-zinc-800">Cover Title</label>
+              <input
+                type="text"
+                name="cover_title"
+                placeholder="e.g., Final Project Report on Web Application Development"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
+              />
+              <p className="text-xs text-zinc-500">This will appear as the main heading on your cover page.</p>
+            </section>
 
-            {/* Course */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="courseName"
-                  className="block text-sm font-medium text-slate-900"
-                >
-                  Course Name
-                </label>
-                <input
-                  type="text"
-                  id="courseName"
-                  name="courseName"
-                  placeholder="Calculus"
-                  required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="courseCode"
-                  className="block text-sm font-medium text-slate-900"
-                >
-                  Course Code
-                </label>
-                <input
-                  type="text"
-                  id="courseCode"
-                  name="courseCode"
-                  placeholder="MAT123"
-                  required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                />
-              </div>
-            </div>
-
-            {/* Student */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="studentName"
-                  className="block text-sm font-medium text-slate-900"
-                >
-                  Student Name
-                </label>
-                <input
-                  type="text"
-                  id="studentName"
-                  name="studentName"
-                  placeholder="John Doe"
-                  required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="studentId"
-                  className="block text-sm font-medium text-slate-900"
-                >
-                  Student ID
-                </label>
-                <input
-                  type="text"
-                  id="studentId"
-                  name="studentId"
-                  placeholder="2511086038"
-                  required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                />
-              </div>
-            </div>
-
-            {/* Submission Date + Section */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="submissionDate"
-                    className="block text-sm font-medium text-slate-900"
-                  >
-                    Submission Date
-                  </label>
+            {/* Course Section */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold text-zinc-800">Course Information</h3>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">Course Name</label>
                   <input
-                    type="date"
-                    id="submissionDate"
-                    name="submissionDate"
-                    required
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    type="text"
+                    name="course_name"
+                    placeholder="e.g., Introduction to Web Development"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
                   />
                 </div>
-                <label
-                  htmlFor="leaveBlank"
-                  className="flex items-center gap-2 text-xs text-slate-600"
-                >
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">Course Code</label>
                   <input
-                    type="checkbox"
-                    id="leaveBlank"
-                    name="leaveBlank"
-                    className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                    type="text"
+                    name="course_code"
+                    placeholder="e.g., CSE-101"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
                   />
-                  <span>Leave blank on the cover page</span>
-                </label>
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="section"
-                  className="block text-sm font-medium text-slate-900"
-                >
-                  Section
-                </label>
-                <input
-                  type="text"
-                  id="section"
-                  name="section"
-                  placeholder="2"
-                  required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                />
-              </div>
-            </div>
+            </section>
 
-            {/* Teacher */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="teacherName"
-                  className="block text-sm font-medium text-slate-900"
-                >
-                  Teacher Name
-                </label>
-                <input
-                  type="text"
-                  id="teacherName"
-                  name="teacherName"
-                  placeholder="John Doe"
-                  required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                />
+            {/* Student Section */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold text-zinc-800">Student Information</h3>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">Student Name</label>
+                  <input
+                    type="text"
+                    name="student_name"
+                    placeholder="Your full name"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">Student ID / Roll</label>
+                  <input
+                    type="text"
+                    name="student_id"
+                    placeholder="Your student ID or roll number"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
+                  />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="teacherPosition"
-                  className="block text-sm font-medium text-slate-900"
-                >
-                  Teacher Position
-                </label>
-                <input
-                  type="text"
-                  id="teacherPosition"
-                  name="teacherPosition"
-                  placeholder="Lecturer"
-                  required
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                />
+            </section>
+
+            {/* Submission & Section */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold text-zinc-800">Class & Submission</h3>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">Submission Date</label>
+                  <input
+                    type="date"
+                    name="submission_date"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
+                  />
+                  <p className="text-[11px] text-zinc-500 mt-1">
+                    If you don&apos;t want the date on the cover, you can skip this.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">Section / Batch</label>
+                  <input
+                    type="text"
+                    name="section_batch"
+                    placeholder="e.g., Section A, Batch 23"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
+                  />
+                </div>
               </div>
-            </div>
+            </section>
+
+            {/* Teacher Section */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold text-zinc-800">Teacher / Instructor</h3>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">Teacher Name</label>
+                  <input
+                    type="text"
+                    name="teacher_name"
+                    placeholder="Instructor&apos;s full name"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">Teacher Position</label>
+                  <input
+                    type="text"
+                    name="teacher_position"
+                    placeholder="e.g., Lecturer, Assistant Professor"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
+                  />
+                </div>
+              </div>
+            </section>
 
             {/* Department */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="department"
-                className="block text-sm font-medium text-slate-900"
-              >
-                Department
-              </label>
+            <section className="space-y-2">
+              <label className="block text-sm font-semibold text-zinc-800">Department / Institute</label>
               <input
                 type="text"
-                id="department"
                 name="department"
-                placeholder="Computer Science and Engineering"
-                required
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                placeholder="e.g., Department of Computer Science & Engineering"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-200"
               />
-            </div>
+            </section>
 
-            {/* Submit (optional, jodi pore handle korar plan thake) */}
-            <div className="pt-2">
+            {/* Actions */}
+            <div className="flex flex-col gap-3 pt-4 border-t border-zinc-200 mt-2 md:flex-row">
               <button
                 type="submit"
-                className="w-full rounded-lg border-2 border-slate-900 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white hover:text-slate-900"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:ring-offset-1"
               >
+                <FileUp className="h-5 w-5" />
                 Generate Cover Page
+              </button>
+              <button
+                type="reset"
+                onClick={handleReset}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 shadow-sm transition hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-200 focus:ring-offset-1"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Reset
               </button>
             </div>
           </form>
         </div>
       </div>
-    </section>
-  );
-};
+    </div>
+  )
+}
 
-export default CoverForm;
+export default CoverForm
