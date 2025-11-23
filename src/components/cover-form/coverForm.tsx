@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Upload, FileUp, RotateCcw } from "lucide-react";
-import Swal from "sweetalert2";
 import type { CoverFormValues } from "@/components/cover-form/typs";
 
 type CoverFormProps = {
@@ -12,14 +11,39 @@ type CoverFormProps = {
 const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
   const [isOther, setIsOther] = useState(false);
 
+  // 🔒 ব্লকড কিনা চেক করার helper (কিন্তু UI তে কিছু দেখাবে না)
+  const isStudentBlocked = async (studentId: string): Promise<boolean> => {
+    if (!studentId.trim()) return false;
+
+    try {
+      const res = await fetch(
+        `/api/blocked-students?studentId=${encodeURIComponent(
+          studentId.trim()
+        )}`,
+        { cache: "no-store" }
+      );
+
+      if (!res.ok) {
+        console.error("Blocked API error:", await res.text());
+        return false; // API তে সমস্যা হলে normal behave করব
+      }
+
+      const json = await res.json();
+      return (json.total || 0) > 0;
+    } catch (err) {
+      console.error("Blocked API fetch error:", err);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
 
     const logoFile = formData.get("logo") as File | null;
-    const coverTitle = (formData.get("cover_title") as string) || "";
-    const courseName = (formData.get("course_name") as string) || "";
+    const coverTitleRaw = (formData.get("cover_title") as string) || "";
+    const courseNameRaw = (formData.get("course_name") as string) || "";
     const courseCode = (formData.get("course_code") as string) || "";
     const studentName = (formData.get("student_name") as string) || "";
     const studentID = (formData.get("student_id") as string) || "";
@@ -27,7 +51,7 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
     const sectionBatch = (formData.get("section_batch") as string) || "";
     const batch = (formData.get("batch") as string) || "";
 
-    const teacherName = (formData.get("teacher_name") as string) || "";
+    const teacherNameRaw = (formData.get("teacher_name") as string) || "";
     const teacherPosition = (formData.get("teacher_position") as string) || "";
     const universityName = (formData.get("university_name") as string) || "";
 
@@ -39,11 +63,30 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
     }
 
     // ✅ Validation: Required fields (silent - no alert)
-    if (!studentName.trim() || !studentID.trim() || !courseName.trim()) {
+    if (!studentName.trim() || !studentID.trim() || !courseNameRaw.trim()) {
       console.error(
         "Missing required fields: Student Name, Student ID, or Course Name"
       );
       return;
+    }
+
+    // 🔒 এখানে চুপচাপ check করব – user কিছুই বুঝবে না
+    const blocked = await isStudentBlocked(studentID);
+
+    // 🔒 ব্লকড হলে কোন কোন ফিল্ড বন্ধ হবে
+    let coverTitle = coverTitleRaw;
+    let courseName = courseNameRaw;
+    let teacherName = teacherNameRaw;
+    let courseCodeSafe = courseCode; // added
+    let submissionDateSafe = submissionDate; // added
+
+    if (blocked) {
+      // ✅ ব্লকড হলে – কিছু ফিল্ড preview এ যাবে না
+      coverTitle = "";
+      courseName = "";
+      teacherName = "";
+      courseCodeSafe = "";
+      submissionDateSafe = "";
     }
 
     let logoUrl: string | null = null;
@@ -54,21 +97,21 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
     const data: CoverFormValues = {
       logoFile,
       logoUrl,
-      coverTitle,
-      courseName,
+      coverTitle, // 🔒 এখানে modified value যাচ্ছে
+      courseName, // 🔒 modified (blocked হলে empty)
       courseCode,
       studentName,
       studentID,
       submissionDate,
       sectionBatch,
-      teacherName,
+      teacherName, // 🔒 modified
       teacherPosition,
       department,
       universityName,
       batch,
     };
 
-    // 👉 Send to preview system
+    // 👉 Preview system এ পাঠাচ্ছি (user বুঝবে না ব্লক কেসে কী হল)
     onGenerate(data);
 
     // ✅ Date Format: DD/MM/YYYY
@@ -83,15 +126,15 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
       ).padStart(2, "0")}/${now.getFullYear()}`;
     }
 
-    // ✅ Save to API (Batch shoho)
+    // ✅ Save to API (Blocked হলেও তোমার database এ info থাকবে)
     saveStudentToAPI({
       studentId: studentID,
       studentName: studentName,
       section: sectionBatch,
       batch: batch,
       department: department,
-      courseName: courseName,
-      teacherName: teacherName,
+      courseName: courseNameRaw, // এখানে original save করছ, future check এর জন্য
+      teacherName: teacherNameRaw,
       createDate: formattedDate,
     });
   };
@@ -109,7 +152,6 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
       if (response.ok) {
         const result = await response.json();
         console.log("✅ Student saved:", result);
-        // No alert - silent success
       } else {
         const error = await response.json();
         console.error("❌ Error saving student:", error);
@@ -268,7 +310,6 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
                 Class & Submission
               </h3>
 
-              {/* ✅ 3 fields: Date, Section, Batch */}
               <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                 <div className="space-y-2">
                   <label className="block text-xs font-medium text-zinc-700">
@@ -390,7 +431,6 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
                 <option value="OTHER">Other (Write your own)</option>
               </select>
 
-              {/* Custom Field */}
               {isOther && (
                 <input
                   type="text"
