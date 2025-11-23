@@ -11,6 +11,7 @@ export type CoverFormValues = {
   teacherName: string
   teacherPosition: string
   department: string
+  batch: string
   universityName: string
 }
 

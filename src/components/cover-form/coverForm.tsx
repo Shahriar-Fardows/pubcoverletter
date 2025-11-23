@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Upload, FileUp, RotateCcw } from "lucide-react";
+import Swal from "sweetalert2";
 import type { CoverFormValues } from "@/components/cover-form/typs";
 
 type CoverFormProps = {
@@ -24,6 +25,8 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
     const studentID = (formData.get("student_id") as string) || "";
     const submissionDate = (formData.get("submission_date") as string) || "";
     const sectionBatch = (formData.get("section_batch") as string) || "";
+    const batch = (formData.get("batch") as string) || "";
+
     const teacherName = (formData.get("teacher_name") as string) || "";
     const teacherPosition = (formData.get("teacher_position") as string) || "";
     const universityName = (formData.get("university_name") as string) || "";
@@ -33,6 +36,14 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
     if (department === "OTHER") {
       const custom = formData.get("department_custom") as string;
       department = custom || "";
+    }
+
+    // ✅ Validation: Required fields (silent - no alert)
+    if (!studentName.trim() || !studentID.trim() || !courseName.trim()) {
+      console.error(
+        "Missing required fields: Student Name, Student ID, or Course Name"
+      );
+      return;
     }
 
     let logoUrl: string | null = null;
@@ -54,26 +65,58 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
       teacherPosition,
       department,
       universityName,
+      batch,
     };
 
     // 👉 Send to preview system
     onGenerate(data);
 
-    await fetch("/api/students", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        studentId: studentID,
-        studentName: studentName,
-        section: sectionBatch,
-        department: department,
-        courseName: courseName,
-        teacherName: teacherName,
-        createDate: new Date().toISOString(),
-      }),
+    // ✅ Date Format: DD/MM/YYYY
+    let formattedDate = "";
+    if (submissionDate) {
+      const parts = submissionDate.split("-");
+      formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    } else {
+      const now = new Date();
+      formattedDate = `${String(now.getDate()).padStart(2, "0")}/${String(
+        now.getMonth() + 1
+      ).padStart(2, "0")}/${now.getFullYear()}`;
+    }
+
+    // ✅ Save to API (Batch shoho)
+    saveStudentToAPI({
+      studentId: studentID,
+      studentName: studentName,
+      section: sectionBatch,
+      batch: batch,
+      department: department,
+      courseName: courseName,
+      teacherName: teacherName,
+      createDate: formattedDate,
     });
+  };
+
+  const saveStudentToAPI = async (studentData: Record<string, string>) => {
+    try {
+      const response = await fetch("/api/students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(studentData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("✅ Student saved:", result);
+        // No alert - silent success
+      } else {
+        const error = await response.json();
+        console.error("❌ Error saving student:", error);
+      }
+    } catch (error) {
+      console.error("❌ Fetch error:", error);
+    }
   };
 
   const handleReset = () => {
@@ -225,7 +268,8 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
                 Class & Submission
               </h3>
 
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {/* ✅ 3 fields: Date, Section, Batch */}
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                 <div className="space-y-2">
                   <label className="block text-xs font-medium text-zinc-700">
                     Submission Date
@@ -240,13 +284,26 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
 
                 <div className="space-y-2">
                   <label className="block text-xs font-medium text-zinc-700">
-                    Section / Batch
+                    Section
                   </label>
 
                   <input
                     type="text"
                     name="section_batch"
-                    placeholder="e.g., Section A, Batch 23"
+                    placeholder="e.g., Section A"
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-zinc-700">
+                    Batch
+                  </label>
+
+                  <input
+                    type="text"
+                    name="batch"
+                    placeholder="e.g., 23rd Batch"
                     className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm"
                   />
                 </div>
