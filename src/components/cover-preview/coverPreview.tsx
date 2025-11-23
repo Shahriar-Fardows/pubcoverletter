@@ -4,10 +4,8 @@ import type React from "react"
 import { useState } from "react"
 import { ChevronLeft, ChevronRight, Printer } from "lucide-react"
 import type { CoverFormValues } from "@/components/cover-form/typs"
-
-import ClassicTemplate from "./templates/classic-template"
-import ModernTemplate from "./templates/modern-template"
 import Basic from "./templates/basic"
+import Formal from "./templates/formal"
 
 type Template = {
   id: string
@@ -26,14 +24,9 @@ const TEMPLATES: Template[] = [
     component: Basic,
   },
   {
-    id: "classic",
-    name: "Classic",
-    component: ClassicTemplate,
-  },
-  {
-    id: "modern",
-    name: "Modern",
-    component: ModernTemplate,
+    id: "formal",
+    name: "Formal",
+    component: Formal,
   },
 ]
 
@@ -127,7 +120,7 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
         id="cover-print-area"
         className="relative overflow-hidden border border-zinc-200 bg-white shadow-lg print:rounded-none print:border-none print:shadow-none"
       >
-        <div className="aspect-[8.2/11] print:aspect-auto">
+        <div className="aspect-[8.1/11] print:aspect-auto">
           <TemplateComponent data={displayData} />
         </div>
       </div>
@@ -135,8 +128,9 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
       {/* Print Styles */}
       <style>{`
       @page {
-    size: A4;
+    
     margin:0px;
+    padding:40px;
   }
         @media print {
           body {

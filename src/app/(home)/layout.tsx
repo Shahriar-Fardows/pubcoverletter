@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
+import Script from "next/script";
 import { Navbar } from "@/components/navbar/navbar";
 
 const inter = Inter({
@@ -23,9 +24,13 @@ export const metadata: Metadata = {
     "Presidency University",
     "PU",
     "Presidency University Bangladesh",
-    "Cover Page",
+    "PU Cover Page",
+    "PUB Cover Page",
+    "Presidency University Cover Page",
+    "Presidency University Cover Page Generator",
     "Assignment Cover Page",
     "PU Cover Generator",
+    "PUB Cover Generator",
     "University Template",
     "Assignment Template",
   ],
@@ -48,6 +53,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" >
+      <head>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-7ZV70MZE13"
+        ></Script>
+
+        <Script id="ga4-script">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-7ZV70MZE13');
+          `}
+        </Script>
+      </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         <Navbar />
         {children}
