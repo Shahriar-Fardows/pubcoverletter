@@ -24,6 +24,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.14.7",
     "@tailwindcss/postcss": "^4",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20",
