@@ -50,10 +50,16 @@ const Basic: React.FC<BasicTemplateProps> = ({ data }) => {
               <span className="font-semibold ">Student ID:</span>{" "}
               {data.studentID}
             </p>
+            <div className="flex justify-center gap-4">
+              <p className="text-center ">
+              <span className="font-semibold ">Batch:</span>{" "}
+              {data.batch}
+            </p>
             <p className="text-center ">
               <span className="font-semibold ">Section:</span>{" "}
               {data.sectionBatch}
             </p>
+            </div>
           </div>
           <div className="flex flex-col gap-2 text-[18px]">
             <p className="text-center  italic">Submitted to</p>

@@ -63,6 +63,7 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
     studentName: coverData?.studentName || "Nafisa Yeasmin",
     studentID: coverData?.studentID || "2511086038",
     submissionDate: coverData?.submissionDate || today,
+    batch: coverData?.batch || "252",
     sectionBatch: coverData?.sectionBatch || "1st",
     teacherName: coverData?.teacherName || "NAFIA MOLLIK",
     teacherPosition: coverData?.teacherPosition || "Lecturer",
