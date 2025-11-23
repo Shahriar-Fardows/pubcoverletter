@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       // Store in session (not localStorage for security)
       sessionStorage.setItem('adminAuth', 'true');
     } else {
-      setError('❌ Wrong password! Password is today\'s date number.');
+      setError('❌ Wrong password! ');
       setPassword('');
     }
   };
