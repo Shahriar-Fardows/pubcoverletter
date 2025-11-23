@@ -11,7 +11,7 @@ const Basic: React.FC<BasicTemplateProps> = ({ data }) => {
 
   return (
     <section className="">
-      <div className=" border-dashed border-[#9ca3af] border-2 h-screen  justify-center items-center print:p-0 m-10 print:m-0">
+      <div className=" border-dashed border-[#9ca3af] border-2 m-10 mt-4 p-10 print:m-10 print:p-10 print:min-h-[10.9in] flex flex-col justify-between">
         <div className="flex flex-col items-center mt-20">
           {data.logoUrl ? (
             <Image

@@ -121,47 +121,49 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
         id="cover-print-area"
         className="relative overflow-hidden border border-zinc-200 bg-white shadow-lg print:rounded-none print:border-none print:shadow-none"
       >
-        <div className="aspect-[8.1/11] print:aspect-auto">
+        {/* aspect-[11/11] */}
+        <div className=" print:aspect-auto">
           <TemplateComponent data={displayData} />
         </div>
       </div>
 
       {/* Print Styles */}
       <style>{`
-      @page {
-    
-    margin:0px;
-    padding:40px;
+  /* Ekta global @page rule, sobar jonno same */
+  @page {
+    margin: 0;
   }
-        @media print {
-          body {
-            margin: 0;
-            padding: 0;
-            background: white;
-          }
 
-          .no-print {
-            display: none !important;
-          }
+  @media print {
+    body {
+      margin: 0;
+      padding: 0;
+      background: white;
+    }
 
-          body * {
-            visibility: hidden;
-          }
+    .no-print {
+      display: none !important;
+    }
 
-          #cover-print-area,
-          #cover-print-area * {
-            visibility: visible;
-          }
+    body * {
+      visibility: hidden;
+    }
 
-          #cover-print-area {
-            position: absolute;
-            inset: 0;
-            margin: 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-          }
-        }
-      `}</style>
+    #cover-print-area,
+    #cover-print-area * {
+      visibility: visible;
+    }
+
+    #cover-print-area {
+      position: absolute;
+      inset: 0;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+  }
+`}</style>
+
     </div>
   )
 }
