@@ -666,7 +666,7 @@ export default function AdminPortal() {
                     <td className="px-6 py-3">{student.studentName || 'N/A'}</td>
                     <td className="px-6 py-3 text-sm">{student.department}</td>
                     <td className="px-6 py-3 text-sm">{student.section || 'N/A'}</td>
-                    <td className="px-6 py-3 text-sm">{student.batch || 'N/A'}</td>
+                    <td className="px-6 py-3 text-sm">{student.batch || 'old'}</td>
                     <td className="px-6 py-3 text-sm">{student.courseName}</td>
                     <td className="px-6 py-3 text-sm">{student.createDate}</td>
                     <td className="px-6 py-3 flex gap-3">
