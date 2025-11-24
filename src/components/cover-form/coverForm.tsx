@@ -10,6 +10,8 @@ type CoverFormProps = {
 
 const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
   const [isOther, setIsOther] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [resetClicked, setResetClicked] = useState(false);
 
   // 🔒 ব্লকড কিনা চেক করার helper (কিন্তু UI তে কিছু দেখাবে না)
   const isStudentBlocked = async (studentId: string): Promise<boolean> => {
@@ -24,8 +26,8 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
       );
 
       if (!res.ok) {
-        console.error("Blocked API error:", await res.text());
-        return false; // API তে সমস্যা হলে normal behave করব
+        // API তে সমস্যা হলে normal behave করব
+        return false;
       }
 
       const json = await res.json();
@@ -38,105 +40,117 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
+    try {
+      const formData = new FormData(e.currentTarget);
 
-    const logoFile = formData.get("logo") as File | null;
-    const coverTitleRaw = (formData.get("cover_title") as string) || "";
-    const courseNameRaw = (formData.get("course_name") as string) || "";
-    const courseCode = (formData.get("course_code") as string) || "";
-    const studentName = (formData.get("student_name") as string) || "";
-    const studentID = (formData.get("student_id") as string) || "";
-    const submissionDate = (formData.get("submission_date") as string) || "";
-    const sectionBatch = (formData.get("section_batch") as string) || "";
-    const batch = (formData.get("batch") as string) || "";
+      const logoFile = formData.get("logo") as File | null;
+      const coverTitleRaw = (formData.get("cover_title") as string) || "";
+      const courseNameRaw = (formData.get("course_name") as string) || "";
+      const courseCode = (formData.get("course_code") as string) || "";
+      const studentName = (formData.get("student_name") as string) || "";
+      const studentID = (formData.get("student_id") as string) || "";
+      const submissionDate = (formData.get("submission_date") as string) || "";
+      const sectionBatch = (formData.get("section_batch") as string) || "";
+      const batch = (formData.get("batch") as string) || "";
 
-    const teacherNameRaw = (formData.get("teacher_name") as string) || "";
-    const teacherPosition = (formData.get("teacher_position") as string) || "";
-    const universityName = (formData.get("university_name") as string) || "";
+      const teacherNameRaw = (formData.get("teacher_name") as string) || "";
+      const teacherPosition =
+        (formData.get("teacher_position") as string) || "";
+      const universityName =
+        (formData.get("university_name") as string) || "";
 
-    // Department logic
-    let department = formData.get("department") as string;
-    if (department === "OTHER") {
-      const custom = formData.get("department_custom") as string;
-      department = custom || "";
+      // Department logic
+      let department = (formData.get("department") as string) || "";
+      if (department === "OTHER") {
+        const custom = (formData.get("department_custom") as string) || "";
+        department = custom;
+      }
+
+      // ✅ Validation: Required fields (silent - no alert, no console.error)
+      if (!studentName.trim() || !studentID.trim() || !courseNameRaw.trim()) {
+        // just stop submit silently
+        return;
+      }
+
+      // 🔒 এখানে চুপচাপ check করব – user কিছুই বুঝবে না
+      const blocked = await isStudentBlocked(studentID);
+
+      // 🔒 ব্লকড হলে কোন কোন ফিল্ড preview এ যাবে না
+      let coverTitle = coverTitleRaw;
+      let courseName = courseNameRaw;
+      let teacherName = teacherNameRaw;
+      let courseCodeSafe = courseCode;
+      let submissionDateSafe = submissionDate;
+
+      if (blocked) {
+        // ✅ ব্লকড হলে – কিছু ফিল্ড preview এ যাবে না
+        coverTitle = "";
+        courseName = "";
+        teacherName = "";
+        courseCodeSafe = "";
+        submissionDateSafe = "";
+      }
+
+      let logoUrl: string | null = null;
+      if (logoFile && logoFile.size > 0) {
+        logoUrl = URL.createObjectURL(logoFile);
+      }
+
+      const data: CoverFormValues = {
+        logoFile,
+        logoUrl,
+        coverTitle, // 🔒 modified value (blocked হলে empty)
+        courseName, // 🔒 modified
+        courseCode: courseCodeSafe, // 🔒 safe value
+        studentName,
+        studentID,
+        submissionDate: submissionDateSafe, // 🔒 safe value
+        sectionBatch,
+        teacherName, // 🔒 modified
+        teacherPosition,
+        department,
+        universityName,
+        batch,
+      };
+
+      // 👉 Preview system এ পাঠাচ্ছি (user বুঝবে না ব্লক কেসে কী হল)
+      onGenerate(data);
+
+      // ✅ Date Format: DD/MM/YYYY (DB er jonno)
+      let formattedDate = "";
+      if (submissionDate) {
+        const parts = submissionDate.split("-");
+        if (parts.length === 3) {
+          formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+      }
+
+      if (!formattedDate) {
+        const now = new Date();
+        formattedDate = `${String(now.getDate()).padStart(2, "0")}/${String(
+          now.getMonth() + 1
+        ).padStart(2, "0")}/${now.getFullYear()}`;
+      }
+
+      // ✅ Save to API (Blocked হলেও database এ info থাকবে)
+      await saveStudentToAPI({
+        studentId: studentID,
+        studentName: studentName,
+        section: sectionBatch,
+        batch: batch,
+        department: department,
+        // এখানে original courseName save করছ, future check এর জন্য
+        courseName: courseNameRaw,
+        teacherName: teacherNameRaw,
+        createDate: formattedDate,
+      });
+    } catch (error) {
+      console.error("❌ handleSubmit error:", error);
+    } finally {
+      setLoading(false);
     }
-
-    // ✅ Validation: Required fields (silent - no alert)
-    if (!studentName.trim() || !studentID.trim() || !courseNameRaw.trim()) {
-      console.error(
-        "Missing required fields: Student Name, Student ID, or Course Name"
-      );
-      return;
-    }
-
-    // 🔒 এখানে চুপচাপ check করব – user কিছুই বুঝবে না
-    const blocked = await isStudentBlocked(studentID);
-
-    // 🔒 ব্লকড হলে কোন কোন ফিল্ড বন্ধ হবে
-    let coverTitle = coverTitleRaw;
-    let courseName = courseNameRaw;
-    let teacherName = teacherNameRaw;
-    let courseCodeSafe = courseCode; // added
-    let submissionDateSafe = submissionDate; // added
-
-    if (blocked) {
-      // ✅ ব্লকড হলে – কিছু ফিল্ড preview এ যাবে না
-      coverTitle = "";
-      courseName = "";
-      teacherName = "";
-      courseCodeSafe = "";
-      submissionDateSafe = "";
-    }
-
-    let logoUrl: string | null = null;
-    if (logoFile && logoFile.size > 0) {
-      logoUrl = URL.createObjectURL(logoFile);
-    }
-
-    const data: CoverFormValues = {
-      logoFile,
-      logoUrl,
-      coverTitle, // 🔒 এখানে modified value যাচ্ছে
-      courseName, // 🔒 modified (blocked হলে empty)
-      courseCode,
-      studentName,
-      studentID,
-      submissionDate,
-      sectionBatch,
-      teacherName, // 🔒 modified
-      teacherPosition,
-      department,
-      universityName,
-      batch,
-    };
-
-    // 👉 Preview system এ পাঠাচ্ছি (user বুঝবে না ব্লক কেসে কী হল)
-    onGenerate(data);
-
-    // ✅ Date Format: DD/MM/YYYY
-    let formattedDate = "";
-    if (submissionDate) {
-      const parts = submissionDate.split("-");
-      formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-    } else {
-      const now = new Date();
-      formattedDate = `${String(now.getDate()).padStart(2, "0")}/${String(
-        now.getMonth() + 1
-      ).padStart(2, "0")}/${now.getFullYear()}`;
-    }
-
-    // ✅ Save to API (Blocked হলেও তোমার database এ info থাকবে)
-    saveStudentToAPI({
-      studentId: studentID,
-      studentName: studentName,
-      section: sectionBatch,
-      batch: batch,
-      department: department,
-      courseName: courseNameRaw, // এখানে original save করছ, future check এর জন্য
-      teacherName: teacherNameRaw,
-      createDate: formattedDate,
-    });
   };
 
   const saveStudentToAPI = async (studentData: Record<string, string>) => {
@@ -162,9 +176,17 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
   };
 
   const handleReset = () => {
-    const form = document.querySelector("form") as HTMLFormElement;
+    const form = document.querySelector("form") as HTMLFormElement | null;
     if (form) form.reset();
+
     setIsOther(false);
+    setLoading(false);
+
+    // ✅ Reset feedback
+    setResetClicked(true);
+    setTimeout(() => {
+      setResetClicked(false);
+    }, 1500);
   };
 
   return (
@@ -250,6 +272,7 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
                     type="text"
                     name="course_name"
                     placeholder="e.g., Web Development"
+                    required
                     className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm"
                   />
                 </div>
@@ -285,6 +308,7 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
                     type="text"
                     name="student_name"
                     placeholder="Your full name"
+                    required
                     className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm"
                   />
                 </div>
@@ -298,6 +322,7 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
                     type="text"
                     name="student_id"
                     placeholder="Your student ID"
+                    required
                     className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm"
                   />
                 </div>
@@ -445,19 +470,40 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
             <div className="flex flex-col gap-3 pt-4 border-t border-zinc-200 mt-2 md:flex-row">
               <button
                 type="submit"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-md hover:bg-black"
+                disabled={loading}
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-md hover:bg-black disabled:opacity-60 disabled:cursor-not-allowed transition"
               >
-                <FileUp className="h-5 w-5" />
-                Generate Cover Page
+                {loading ? (
+                  <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a12 12 0 00-12 12h4z"
+                    />
+                  </svg>
+                ) : (
+                  <FileUp className="h-5 w-5" />
+                )}
+
+                {loading ? "Generating..." : "Generate Cover Page"}
               </button>
 
               <button
                 type="reset"
                 onClick={handleReset}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 hover:bg-zinc-50"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition"
               >
                 <RotateCcw className="h-4 w-4" />
-                Reset
+                {resetClicked ? "Reset Done" : "Reset"}
               </button>
             </div>
           </form>
