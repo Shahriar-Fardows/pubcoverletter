@@ -3,7 +3,7 @@ import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
 import Script from "next/script";
 import { Navbar } from "@/components/navbar/navbar";
-import OncePopup from "@/components/once-popup/OncePopup";
+// import OncePopup from "@/components/once-popup/OncePopup";
 import Tracker from "@/components/analytics/page";
 
 const inter = Inter({
@@ -72,7 +72,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         <Navbar />
-        <OncePopup />
+        {/* <OncePopup /> */}
         <Tracker />
         {children}
       </body>
