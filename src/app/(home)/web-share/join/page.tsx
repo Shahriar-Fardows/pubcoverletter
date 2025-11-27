@@ -16,7 +16,7 @@ function JoinLoadingFallback() {
         <div className="flex justify-center mb-4">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-purple-200 border-t-purple-600" />
         </div>
-        <p className="text-gray-600">Loading session...</p>
+        {/* <p className="text-gray-600">Loading session...</p> */}
       </div>
     </div>
   );
