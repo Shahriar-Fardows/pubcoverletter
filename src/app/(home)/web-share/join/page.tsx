@@ -1,12 +1,12 @@
-import JoinSharePage from "@/components/mobile/join-share";
-import { Suspense } from "react";
+import JoinSharePage from "@/components/mobile/join-share"
+import { Suspense } from "react"
 
 export default function JoinPage() {
   return (
     <Suspense fallback={<JoinLoadingFallback />}>
       <JoinSharePage />
     </Suspense>
-  );
+  )
 }
 
 function JoinLoadingFallback() {
@@ -19,5 +19,5 @@ function JoinLoadingFallback() {
         <p className="text-gray-600">Loading session...</p>
       </div>
     </div>
-  );
+  )
 }
