@@ -1,4 +1,3 @@
-// lib/cloudinary.ts
 import { v2 as cloudinary } from "cloudinary";
 
 if (
@@ -6,7 +5,9 @@ if (
   !process.env.CLOUDINARY_API_KEY ||
   !process.env.CLOUDINARY_API_SECRET
 ) {
-  throw new Error("Cloudinary env vars missing. Check .env.local");
+  throw new Error(
+    "❌ Cloudinary env vars missing: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET"
+  );
 }
 
 cloudinary.config({
