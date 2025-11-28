@@ -49,7 +49,7 @@ export default function WebSharePage() {
 
     // Get the current protocol and host (works with ngrok)
     const baseUrl = `${window.location.protocol}//${window.location.host}`
-    const joinUrl = `${baseUrl}/join?session=${sessionId}`
+    const joinUrl = `${baseUrl}/web-share/join?session=${sessionId}`
 
     console.log("[v0] Generated QR URL:", joinUrl)
 
