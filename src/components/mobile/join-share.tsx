@@ -28,27 +28,36 @@ export default function JoinSharePage(): ReactElement {
   const fileTimersRef = useState<Map<string, NodeJS.Timeout>>(new Map())
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeRemaining((prev) => {
-        const newMap = new Map(prev)
-        let hasExpired = false
-        newMap.forEach((time, key) => {
-          const newTime = time - 1
-          if (newTime <= 0) {
-            newMap.delete(key)
-            hasExpired = true
-          } else {
-            newMap.set(key, newTime)
-          }
-        })
-        if (hasExpired) {
-          setReceivedFiles((prevFiles) => prevFiles.filter((f) => newMap.has(f.publicId)))
+    const pollFiles = async () => {
+      try {
+        const res = await fetch(`/api/rooms/${sessionId}`)
+        const data = await res.json()
+
+        if (data.files) {
+          setReceivedFiles(data.files)
+
+          // Initialize time remaining map
+          const timings = new Map<string, number>()
+          data.files.forEach((file: FileInfo & { timeRemaining?: number }) => {
+            if (file.timeRemaining !== undefined) {
+              timings.set(file.publicId, Math.ceil(file.timeRemaining / 1000))
+            }
+          })
+          setTimeRemaining(timings)
         }
-        return newMap
-      })
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
+      } catch (err) {
+        console.error("[v0] Poll error:", err)
+      }
+    }
+
+    // Poll immediately and then every 1 second
+    if (sessionId) {
+      pollFiles()
+      const interval = setInterval(pollFiles, 1000)
+
+      return () => clearInterval(interval)
+    }
+  }, [sessionId])
 
   const handleManualJoin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
