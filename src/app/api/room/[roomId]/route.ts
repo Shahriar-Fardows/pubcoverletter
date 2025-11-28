@@ -1,44 +1,50 @@
+import { Redis } from "@upstash/redis"
 import { NextResponse } from "next/server"
 
-const roomsData = new Map<
-  string,
-  {
-    files: Array<{
-      name: string
-      size: number
-      url: string
-      publicId: string
-      uploadedBy: string
-      uploadedAt: number
-      expiresAt: number
-    }>
-    createdAt: number
-  }
->()
+// Initialize Redis client using Upstash environment variables
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL || "",
+  token: process.env.KV_REST_API_TOKEN || "",
+})
 
-// Cleanup expired files
-setInterval(() => {
-  const now = Date.now()
-  roomsData.forEach((room, roomId) => {
-    room.files = room.files.filter((file) => file.expiresAt > now)
-    if (room.files.length === 0 && now - room.createdAt > 30 * 60 * 1000) {
-      roomsData.delete(roomId)
-    }
-  })
-}, 10000) // Cleanup every 10 seconds
+interface StoredFile {
+  name: string
+  size: number
+  url: string
+  publicId: string
+  uploadedBy: string
+  uploadedAt: number
+  expiresAt: number
+}
+
+interface RoomData {
+  files: StoredFile[]
+  createdAt: number
+}
 
 export async function GET(request: Request, { params }: { params: Promise<{ roomId: string }> }) {
   try {
     const { roomId } = await params
-    const room = roomsData.get(roomId)
 
-    if (!room) {
+    const roomKey = `room:${roomId}`
+    const roomData = (await redis.get(roomKey)) as RoomData | null
+
+    if (!roomData) {
       return NextResponse.json({ files: [] })
     }
 
     // Filter out expired files
     const now = Date.now()
-    const activeFiles = room.files.filter((file) => file.expiresAt > now)
+    const activeFiles = roomData.files.filter((file) => file.expiresAt > now)
+
+    // Update room data if expired files were removed
+    if (activeFiles.length !== roomData.files.length) {
+      if (activeFiles.length === 0) {
+        await redis.del(roomKey)
+      } else {
+        await redis.setex(roomKey, 30 * 60, JSON.stringify({ ...roomData, files: activeFiles }))
+      }
+    }
 
     return NextResponse.json({
       files: activeFiles.map((file) => ({
@@ -62,18 +68,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ roo
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // Initialize room if not exists
-    if (!roomsData.has(roomId)) {
-      roomsData.set(roomId, {
+    const roomKey = `room:${roomId}`
+    let roomData = (await redis.get(roomKey)) as RoomData | null
+
+    if (!roomData) {
+      roomData = {
         files: [],
         createdAt: Date.now(),
-      })
+      }
     }
 
-    const room = roomsData.get(roomId)!
     const expiresAt = Date.now() + 3 * 60 * 1000 // 3 minutes
 
-    const newFile = {
+    const newFile: StoredFile = {
       name: fileInfo.name,
       size: fileInfo.size,
       url: fileInfo.url,
@@ -83,7 +90,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ roo
       expiresAt,
     }
 
-    room.files.push(newFile)
+    roomData.files.push(newFile)
+
+    // Store in Redis with 30 minute expiration
+    await redis.setex(roomKey, 30 * 60, JSON.stringify(roomData))
 
     console.log(`[v0] File added to room ${roomId}: ${fileInfo.name}`)
 

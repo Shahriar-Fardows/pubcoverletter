@@ -3,7 +3,7 @@
 import type React from "react"
 
 import type { ReactElement } from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { Download, Share2, Wifi, Clock, Upload, Copy, Check, AlertCircle } from "lucide-react"
 
@@ -14,6 +14,7 @@ interface FileInfo {
   publicId: string
   uploadedBy?: string
   expiresAt?: number
+  timeRemaining?: number
 }
 
 export default function JoinSharePage(): ReactElement {
@@ -24,38 +25,35 @@ export default function JoinSharePage(): ReactElement {
   const [receivedFiles, setReceivedFiles] = useState<FileInfo[]>([])
   const [uploadProgress, setUploadProgress] = useState(0)
   const [copied, setCopied] = useState(false)
-  const [timeRemaining, setTimeRemaining] = useState<Map<string, number>>(new Map())
-  const fileTimersRef = useState<Map<string, NodeJS.Timeout>>(new Map())
+  const [isConnected, setIsConnected] = useState(false)
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
+    if (!sessionId) return
+
+    setIsConnected(true)
+
     const pollFiles = async () => {
       try {
         const res = await fetch(`/api/rooms/${sessionId}`)
-        const data = await res.json()
+        if (!res.ok) throw new Error("Failed to fetch files")
 
+        const data = await res.json()
         if (data.files) {
           setReceivedFiles(data.files)
-
-          // Initialize time remaining map
-          const timings = new Map<string, number>()
-          data.files.forEach((file: FileInfo & { timeRemaining?: number }) => {
-            if (file.timeRemaining !== undefined) {
-              timings.set(file.publicId, Math.ceil(file.timeRemaining / 1000))
-            }
-          })
-          setTimeRemaining(timings)
         }
       } catch (err) {
         console.error("[v0] Poll error:", err)
       }
     }
 
-    // Poll immediately and then every 1 second
-    if (sessionId) {
-      pollFiles()
-      const interval = setInterval(pollFiles, 1000)
+    pollFiles()
+    pollIntervalRef.current = setInterval(pollFiles, 1000)
 
-      return () => clearInterval(interval)
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+      }
     }
   }, [sessionId])
 
@@ -136,21 +134,15 @@ export default function JoinSharePage(): ReactElement {
             publicId: response.public_id,
           }
 
-          fetch("/api/socket", {
+          fetch(`/api/rooms/${sessionId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              action: "file-info",
-              data: {
-                roomId: sessionId,
-                fileInfo,
-                publicId: response.public_id,
-                userId: `mobile-${sessionId.slice(0, 8)}`,
-              },
+              fileInfo,
+              userId: `mobile-${sessionId.slice(0, 8)}`,
             }),
           }).catch(console.error)
 
-          setReceivedFiles((prev) => [...prev, fileInfo])
           setUploadProgress(0)
           alert("File shared successfully!")
         } else {
@@ -242,10 +234,10 @@ export default function JoinSharePage(): ReactElement {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Connection Status</p>
-                <p className="text-2xl font-bold text-gray-900">Connected</p>
+                <p className="text-2xl font-bold text-gray-900">{isConnected ? "Connected" : "Connecting..."}</p>
               </div>
-              <div className="rounded-full bg-green-100 p-3">
-                <Wifi className="h-6 w-6 text-green-600" />
+              <div className={`rounded-full p-3 ${isConnected ? "bg-green-100" : "bg-red-100"}`}>
+                <Wifi className={`h-6 w-6 ${isConnected ? "text-green-600" : "text-red-600"}`} />
               </div>
             </div>
           </div>
@@ -286,7 +278,7 @@ export default function JoinSharePage(): ReactElement {
             ) : (
               <div className="space-y-3">
                 {receivedFiles.map((file) => {
-                  const timeLeft = timeRemaining.get(file.publicId) ?? 0
+                  const timeLeft = Math.ceil((file.timeRemaining || 0) / 1000)
                   const isExpiringSoon = timeLeft <= 30
                   return (
                     <div

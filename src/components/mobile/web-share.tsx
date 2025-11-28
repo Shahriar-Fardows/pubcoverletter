@@ -49,7 +49,7 @@ export default function WebSharePage() {
     if (!sessionId) return
 
     const baseUrl = `${window.location.protocol}//${window.location.host}`
-    const joinUrl = `${baseUrl}/web-share/join?session=${sessionId}`
+    const joinUrl = `${baseUrl}/join?session=${sessionId}`
 
     QRCode.toDataURL(joinUrl, (err, url) => {
       if (err) console.error("[v0] QR Code error:", err)
