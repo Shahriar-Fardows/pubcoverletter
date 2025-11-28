@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import QRCode from "qrcode"
 import { Download, Share2, Wifi, Clock, Users, Upload, Copy, Check, AlertCircle } from "lucide-react"
 
@@ -13,6 +13,7 @@ interface FileInfo {
   publicId: string
   uploadedBy?: string
   expiresAt?: number
+  timeRemaining?: number
 }
 
 interface ConnectedDevice {
@@ -26,16 +27,17 @@ export default function WebSharePage() {
   const [connectedDevices, setConnectedDevices] = useState<ConnectedDevice[]>([])
   const [receivedFiles, setReceivedFiles] = useState<FileInfo[]>([])
   const [uploadProgress, setUploadProgress] = useState<number>(0)
-  const [isConnected, setIsConnected] = useState(true)
+  const [isConnected, setIsConnected] = useState(false)
   const [copied, setCopied] = useState(false)
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Create session
   useEffect(() => {
     const createSession = async () => {
       try {
         const res = await fetch("/api/session")
         const data = await res.json()
         setSessionId(data.sessionId)
+        setIsConnected(true)
       } catch (err) {
         console.error("[v0] Session create error:", err)
       }
@@ -43,20 +45,58 @@ export default function WebSharePage() {
     createSession()
   }, [])
 
-  // Generate QR code
   useEffect(() => {
     if (!sessionId) return
 
-    // Get the current protocol and host (works with ngrok)
     const baseUrl = `${window.location.protocol}//${window.location.host}`
     const joinUrl = `${baseUrl}/web-share/join?session=${sessionId}`
-
-    console.log("[v0] Generated QR URL:", joinUrl)
 
     QRCode.toDataURL(joinUrl, (err, url) => {
       if (err) console.error("[v0] QR Code error:", err)
       else setQrCodeUrl(url)
     })
+  }, [sessionId])
+
+  useEffect(() => {
+    if (!sessionId) return
+
+    const pollFiles = async () => {
+      try {
+        const res = await fetch(`/api/rooms/${sessionId}`)
+        const data = await res.json()
+
+        if (data.files) {
+          setReceivedFiles(data.files)
+
+          // Track devices
+          const devices = new Set<string>()
+          data.files.forEach((file: FileInfo) => {
+            if (file.uploadedBy && file.uploadedBy !== `web-${sessionId.slice(0, 8)}`) {
+              devices.add(file.uploadedBy)
+            }
+          })
+
+          setConnectedDevices(
+            Array.from(devices).map((userId) => ({
+              userId,
+              timestamp: Date.now(),
+            })),
+          )
+        }
+      } catch (err) {
+        console.error("[v0] Poll error:", err)
+      }
+    }
+
+    // Poll immediately and then every 1 second
+    pollFiles()
+    pollIntervalRef.current = setInterval(pollFiles, 1000)
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+      }
+    }
   }, [sessionId])
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,28 +161,22 @@ export default function WebSharePage() {
       xhr.onload = () => {
         if (xhr.status === 200) {
           const response = JSON.parse(xhr.responseText)
-          const fileInfo: FileInfo = {
+          const fileInfo = {
             name: file.name,
             size: file.size,
             url: response.secure_url,
             publicId: response.public_id,
           }
 
-          fetch("/api/socket", {
+          fetch(`/api/rooms/${sessionId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              action: "file-info",
-              data: {
-                roomId: sessionId,
-                fileInfo,
-                publicId: response.public_id,
-                userId: `web-${sessionId.slice(0, 8)}`,
-              },
+              fileInfo,
+              userId: `web-${sessionId.slice(0, 8)}`,
             }),
           }).catch(console.error)
 
-          setReceivedFiles((prev) => [...prev, fileInfo])
           setUploadProgress(0)
         } else {
           setUploadProgress(0)
@@ -162,12 +196,6 @@ export default function WebSharePage() {
     navigator.clipboard.writeText(sessionId || "")
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }
-
-  const getTimeRemaining = (expiresAt?: number) => {
-    if (!expiresAt) return "∞"
-    const remaining = Math.max(0, expiresAt - Date.now())
-    return `${Math.ceil(remaining / 1000)}s`
   }
 
   const formatFileSize = (bytes: number) => {
@@ -301,41 +329,50 @@ export default function WebSharePage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {receivedFiles.map((file) => (
-                    <div
-                      key={file.publicId}
-                      className="flex items-center justify-between rounded-lg border border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 p-4 transition hover:border-gray-300"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <a
-                          href={file.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block truncate font-medium text-blue-600 underline hover:text-blue-700"
-                          title={file.name}
-                        >
-                          📄 {file.name}
-                        </a>
-                        <div className="mt-1 flex items-center gap-4 text-xs text-gray-600">
-                          <span>{formatFileSize(file.size)}</span>
-                          {file.uploadedBy && <span>From: {file.uploadedBy}</span>}
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{getTimeRemaining(file.expiresAt)}</span>
+                  {receivedFiles.map((file) => {
+                    const timeLeft = Math.ceil((file.timeRemaining || 0) / 1000)
+                    const isExpiringSoon = timeLeft <= 30
+
+                    return (
+                      <div
+                        key={file.publicId}
+                        className={`flex items-center justify-between rounded-lg border p-4 transition ${
+                          isExpiringSoon
+                            ? "border-orange-200 bg-gradient-to-r from-orange-50 to-red-50"
+                            : "border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100"
+                        }`}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block truncate font-medium text-blue-600 underline hover:text-blue-700"
+                            title={file.name}
+                          >
+                            {file.name}
+                          </a>
+                          <div className="mt-1 flex items-center gap-4 text-xs text-gray-600">
+                            <span>{formatFileSize(file.size)}</span>
+                            {file.uploadedBy && <span>From: {file.uploadedBy}</span>}
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              <span className={isExpiringSoon ? "text-red-600 font-semibold" : ""}>{timeLeft}s</span>
+                            </div>
                           </div>
                         </div>
+                        <a
+                          href={file.url}
+                          download={file.name}
+                          className="ml-4 inline-flex items-center gap-2 rounded-lg bg-blue-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-600"
+                          title="Download file"
+                        >
+                          <Download className="h-4 w-4" />
+                          <span className="hidden sm:inline">Download</span>
+                        </a>
                       </div>
-                      <a
-                        href={file.url}
-                        download={file.name}
-                        className="ml-4 inline-flex items-center gap-2 rounded-lg bg-blue-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-600"
-                        title="Download file"
-                      >
-                        <Download className="h-4 w-4" />
-                        <span className="hidden sm:inline">Download</span>
-                      </a>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
