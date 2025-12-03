@@ -1,101 +1,109 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import { Upload, FileUp, RotateCcw } from "lucide-react";
-import type { CoverFormValues } from "@/components/cover-form/typs";
+import React, { useState } from "react"
+import { Upload, FileUp, RotateCcw } from "lucide-react"
+import type { CoverFormValues } from "@/components/cover-form/typs"
+
+type TemplateId = "basic" | "formal"
 
 type CoverFormProps = {
-  onGenerate: (data: CoverFormValues) => void;
-};
+  onGenerate: (data: CoverFormValues) => void
+  selectedTemplateId: TemplateId
+  onTemplateChange: (id: TemplateId) => void
+}
 
-const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
-  const [isOther, setIsOther] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [resetClicked, setResetClicked] = useState(false);
+const CoverForm: React.FC<CoverFormProps> = ({
+  onGenerate,
+  selectedTemplateId,
+  onTemplateChange,
+}) => {
+  const [isOther, setIsOther] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [resetClicked, setResetClicked] = useState(false)
 
   // 🔒 ব্লকড কিনা চেক করার helper (কিন্তু UI তে কিছু দেখাবে না)
   const isStudentBlocked = async (studentId: string): Promise<boolean> => {
-    if (!studentId.trim()) return false;
+    if (!studentId.trim()) return false
 
     try {
       const res = await fetch(
         `/api/blocked-students?studentId=${encodeURIComponent(
-          studentId.trim()
+          studentId.trim(),
         )}`,
-        { cache: "no-store" }
-      );
+        { cache: "no-store" },
+      )
 
       if (!res.ok) {
         // API তে সমস্যা হলে normal behave করব
-        return false;
+        return false
       }
 
-      const json = await res.json();
-      return (json.total || 0) > 0;
+      const json = await res.json()
+      return (json.total || 0) > 0
     } catch (err) {
-      console.error("Blocked API fetch error:", err);
-      return false;
+      console.error("Blocked API fetch error:", err)
+      return false
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(e.currentTarget)
 
-      const logoFile = formData.get("logo") as File | null;
-      const coverTitleRaw = (formData.get("cover_title") as string) || "";
-      const courseNameRaw = (formData.get("course_name") as string) || "";
-      const courseCode = (formData.get("course_code") as string) || "";
-      const studentName = (formData.get("student_name") as string) || "";
-      const studentID = (formData.get("student_id") as string) || "";
-      const submissionDate = (formData.get("submission_date") as string) || "";
-      const sectionBatch = (formData.get("section_batch") as string) || "";
-      const batch = (formData.get("batch") as string) || "";
+      const logoFile = formData.get("logo") as File | null
+      const coverTitleRaw = (formData.get("cover_title") as string) || ""
+      const courseNameRaw = (formData.get("course_name") as string) || ""
+      const courseCode = (formData.get("course_code") as string) || ""
+      const studentName = (formData.get("student_name") as string) || ""
+      const studentID = (formData.get("student_id") as string) || ""
+      const submissionDate = (formData.get("submission_date") as string) || ""
+      const sectionBatch = (formData.get("section_batch") as string) || ""
+      const batch = (formData.get("batch") as string) || ""
 
-      const teacherNameRaw = (formData.get("teacher_name") as string) || "";
+      const teacherNameRaw = (formData.get("teacher_name") as string) || ""
       const teacherPosition =
-        (formData.get("teacher_position") as string) || "";
+        (formData.get("teacher_position") as string) || ""
       const universityName =
-        (formData.get("university_name") as string) || "";
+        (formData.get("university_name") as string) || ""
 
       // Department logic
-      let department = (formData.get("department") as string) || "";
+      let department = (formData.get("department") as string) || ""
       if (department === "OTHER") {
-        const custom = (formData.get("department_custom") as string) || "";
-        department = custom;
+        const custom = (formData.get("department_custom") as string) || ""
+        department = custom
       }
 
       // ✅ Validation: Required fields (silent - no alert, no console.error)
       if (!studentName.trim() || !studentID.trim() || !courseNameRaw.trim()) {
         // just stop submit silently
-        return;
+        return
       }
 
       // 🔒 এখানে চুপচাপ check করব – user কিছুই বুঝবে না
-      const blocked = await isStudentBlocked(studentID);
+      const blocked = await isStudentBlocked(studentID)
 
       // 🔒 ব্লকড হলে কোন কোন ফিল্ড preview এ যাবে না
-      let coverTitle = coverTitleRaw;
-      let courseName = courseNameRaw;
-      let teacherName = teacherNameRaw;
-      let courseCodeSafe = courseCode;
-      let submissionDateSafe = submissionDate;
+      let coverTitle = coverTitleRaw
+      let courseName = courseNameRaw
+      let teacherName = teacherNameRaw
+      let courseCodeSafe = courseCode
+      let submissionDateSafe = submissionDate
 
       if (blocked) {
         // ✅ ব্লকড হলে – কিছু ফিল্ড preview এ যাবে না
-        coverTitle = "";
-        courseName = "";
-        teacherName = "";
-        courseCodeSafe = "";
-        submissionDateSafe = "";
+        coverTitle = ""
+        courseName = ""
+        teacherName = ""
+        courseCodeSafe = ""
+        submissionDateSafe = ""
       }
 
-      let logoUrl: string | null = null;
+      let logoUrl: string | null = null
       if (logoFile && logoFile.size > 0) {
-        logoUrl = URL.createObjectURL(logoFile);
+        logoUrl = URL.createObjectURL(logoFile)
       }
 
       const data: CoverFormValues = {
@@ -113,25 +121,25 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
         department,
         universityName,
         batch,
-      };
+      }
 
       // 👉 Preview system এ পাঠাচ্ছি (user বুঝবে না ব্লক কেসে কী হল)
-      onGenerate(data);
+      onGenerate(data)
 
       // ✅ Date Format: DD/MM/YYYY (DB er jonno)
-      let formattedDate = "";
+      let formattedDate = ""
       if (submissionDate) {
-        const parts = submissionDate.split("-");
+        const parts = submissionDate.split("-")
         if (parts.length === 3) {
-          formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+          formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`
         }
       }
 
       if (!formattedDate) {
-        const now = new Date();
+        const now = new Date()
         formattedDate = `${String(now.getDate()).padStart(2, "0")}/${String(
-          now.getMonth() + 1
-        ).padStart(2, "0")}/${now.getFullYear()}`;
+          now.getMonth() + 1,
+        ).padStart(2, "0")}/${now.getFullYear()}`
       }
 
       // ✅ Save to API (Blocked হলেও database এ info থাকবে)
@@ -145,13 +153,13 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
         courseName: courseNameRaw,
         teacherName: teacherNameRaw,
         createDate: formattedDate,
-      });
+      })
     } catch (error) {
-      console.error("❌ handleSubmit error:", error);
+      console.error("❌ handleSubmit error:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const saveStudentToAPI = async (studentData: Record<string, string>) => {
     try {
@@ -161,33 +169,36 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(studentData),
-      });
+      })
 
       if (response.ok) {
-        const result = await response.json();
-        console.log("✅ Student saved:", result);
+        const result = await response.json()
+        console.log("✅ Student saved:", result)
       } else {
-        const error = await response.json();
-        console.error("❌ Error saving student:", error);
+        const error = await response.json()
+        console.error("❌ Error saving student:", error)
       }
     } catch (error) {
-      console.error("❌ Fetch error:", error);
+      console.error("❌ Fetch error:", error)
     }
-  };
+  }
 
   const handleReset = () => {
-    const form = document.querySelector("form") as HTMLFormElement | null;
-    if (form) form.reset();
+    const form = document.querySelector("form") as HTMLFormElement | null
+    if (form) form.reset()
 
-    setIsOther(false);
-    setLoading(false);
+    setIsOther(false)
+    setLoading(false)
+
+    // Template o default e niye jabo
+    onTemplateChange("basic")
 
     // ✅ Reset feedback
-    setResetClicked(true);
+    setResetClicked(true)
     setTimeout(() => {
-      setResetClicked(false);
-    }, 1500);
-  };
+      setResetClicked(false)
+    }, 1500)
+  }
 
   return (
     <div className="min-h-screen px-4">
@@ -466,6 +477,29 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
               )}
             </section>
 
+            {/* 🧩 Template Selector (Form er niche) */}
+            <section className="space-y-2 pt-2 border-t border-zinc-200">
+              <label className="block text-sm font-semibold text-zinc-800">
+                Template Style
+              </label>
+
+              <select
+                name="template_style"
+                value={selectedTemplateId}
+                onChange={(e) =>
+                  onTemplateChange(e.target.value as TemplateId)
+                }
+                className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900"
+              >
+                <option value="basic">Basic Template</option>
+                <option value="formal">Formal Template</option>
+              </select>
+
+              <p className="text-xs text-zinc-500">
+                You can also switch templates from the preview panel.
+              </p>
+            </section>
+
             {/* Buttons */}
             <div className="flex flex-col gap-3 pt-4 border-t border-zinc-200 mt-2 md:flex-row">
               <button
@@ -510,7 +544,7 @@ const CoverForm: React.FC<CoverFormProps> = ({ onGenerate }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CoverForm;
+export default CoverForm

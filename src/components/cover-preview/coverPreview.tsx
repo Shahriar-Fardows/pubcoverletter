@@ -1,20 +1,23 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { ChevronLeft, ChevronRight, Printer } from "lucide-react"
 import type { CoverFormValues } from "@/components/cover-form/typs"
+import { ChevronLeft, ChevronRight, Printer } from "lucide-react"
 import Basic from "./templates/basic"
 import Formal from "./templates/formal"
 
+type TemplateId = "basic" | "formal"
+
 type Template = {
-  id: string
+  id: TemplateId
   name: string
   component: React.ComponentType<{ data: CoverFormValues }>
 }
 
 type CoverPreviewProps = {
   coverData: CoverFormValues | null
+  selectedTemplateId: TemplateId
+  onTemplateChange?: (id: TemplateId) => void
 }
 
 const TEMPLATES: Template[] = [
@@ -30,22 +33,33 @@ const TEMPLATES: Template[] = [
   },
 ]
 
-const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
-  const [currentTemplateIndex, setCurrentTemplateIndex] = useState(0)
-  const currentTemplate = TEMPLATES[currentTemplateIndex]
-  const TemplateComponent = currentTemplate.component
-
+const CoverPreview: React.FC<CoverPreviewProps> = ({
+  coverData,
+  selectedTemplateId,
+  onTemplateChange,
+}) => {
   const handlePrevious = () => {
-    setCurrentTemplateIndex((prev) => (prev === 0 ? TEMPLATES.length - 1 : prev - 1))
+    if (!onTemplateChange) return
+    const currentIndex = TEMPLATES.findIndex((t) => t.id === selectedTemplateId)
+    const newIndex = currentIndex === 0 ? TEMPLATES.length - 1 : currentIndex - 1
+    onTemplateChange(TEMPLATES[newIndex].id)
   }
 
   const handleNext = () => {
-    setCurrentTemplateIndex((prev) => (prev === TEMPLATES.length - 1 ? 0 : prev + 1))
+    if (!onTemplateChange) return
+    const currentIndex = TEMPLATES.findIndex((t) => t.id === selectedTemplateId)
+    const newIndex = currentIndex === TEMPLATES.length - 1 ? 0 : currentIndex + 1
+    onTemplateChange(TEMPLATES[newIndex].id)
   }
 
   const handlePrint = () => {
     window.print()
   }
+
+  // Selected template theke component ber korbo
+  const currentTemplate =
+    TEMPLATES.find((t) => t.id === selectedTemplateId) ?? TEMPLATES[0]
+  const TemplateComponent = currentTemplate.component
 
   // Ei ta protibar render e notun date dibe
   const today = new Date().toISOString().split("T")[0]
@@ -67,7 +81,8 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
     sectionBatch: coverData?.sectionBatch || "1st",
     teacherName: coverData?.teacherName || "NAFIA MOLLIK",
     teacherPosition: coverData?.teacherPosition || "Lecturer",
-    department: coverData?.department || "Department of Computer Science & Engineering",
+    department:
+      coverData?.department || "Department of Computer Science & Engineering",
     universityName: coverData?.universityName || "Presidency University",
   }
 
@@ -91,7 +106,8 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
               {currentTemplate.name} Template
             </span>
             <span className="text-[11px] text-zinc-500">
-              {currentTemplateIndex + 1} of {TEMPLATES.length}
+              {TEMPLATES.findIndex((t) => t.id === selectedTemplateId) + 1} of{" "}
+              {TEMPLATES.length}
             </span>
           </div>
 
@@ -121,15 +137,13 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
         id="cover-print-area"
         className="relative overflow-hidden border border-zinc-200 bg-white shadow-lg print:rounded-none print:border-none print:shadow-none"
       >
-        {/* aspect-[11/11] */}
-        <div className=" print:aspect-auto">
+        <div className="print:aspect-auto">
           <TemplateComponent data={displayData} />
         </div>
       </div>
 
       {/* Print Styles */}
       <style>{`
-  /* Ekta global @page rule, sobar jonno same */
   @page {
     margin: 0;
   }
@@ -163,7 +177,6 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData }) => {
     }
   }
 `}</style>
-
     </div>
   )
 }
