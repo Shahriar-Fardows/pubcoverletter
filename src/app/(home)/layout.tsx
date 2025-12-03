@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     title: "Presidency University Cover Page Generator",
     description:
       "Generate your PU cover page instantly from multiple modern templates.",
-    url: "https://your-domain.com",
+    url: "https://pubcoverletter.netlify.app/",
     siteName: "Presidency University Cover Page Generator",
     type: "website",
   },
