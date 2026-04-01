@@ -44,11 +44,13 @@ export async function POST(req: Request) {
     const base64Content = pdfDataUri.split(",")[1] || pdfDataUri;
 
     // Send Email
+    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    
     const { data, error } = await resend.emails.send({
-      from: "CoverDash Builder <onboarding@resend.dev>",
+      from: `Resume Builder <${fromEmail}>`,
       to: [recipient],
       subject: `${studentName || 'Student'} - Resume attached`,
-      html: `<p>Hello!</p><p>Please find the generated resume for <b>${studentName || "the candidate"}</b> attached to this email.</p><br/><i>Powered by TeachFosys Resume Builder</i>`,
+      html: `<p>Hello!</p><p>Please find the generated resume for <b>${studentName || "the candidate"}</b> attached to this email.</p><br/><i>Auto-generated Document</i>`,
       attachments: [
         {
           filename: `${studentName?.replace(/\s+/g, '_') || "Resume"}.jpeg`,
@@ -59,6 +61,12 @@ export async function POST(req: Request) {
 
     if (error) {
        console.error("Resend delivery failed:", error);
+       
+       // Handle common Resend onboarding restriction
+       if (fromEmail === "onboarding@resend.dev") {
+           return NextResponse.json({ error: "Resend Free tier limit: You can ONLY send emails to the email address you registered your Resend account with. To send to anyone else, verify your domain in Resend.com!" }, { status: 403 });
+       }
+       
        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
