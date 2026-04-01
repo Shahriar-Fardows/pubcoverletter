@@ -98,23 +98,23 @@ export default function AnalyticsChart() {
   const totalViews = activeData.reduce((sum, d) => sum + d.views, 0);
 
   return (
-    <div className="bg-gray-800 p-6 rounded-lg">
+    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-6 shadow-lg backdrop-blur-md">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-bold text-white">🌐 Website Views Analytics</h3>
-          <p className="text-xs text-gray-400">
-            Custom MongoDB based tracking
+          <h3 className="text-lg font-bold text-white tracking-wide">🌐 Website Views Analytics</h3>
+          <p className="text-xs font-medium text-slate-400 mt-1">
+            Core MongoDB tracking
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 p-1 bg-slate-900/50 rounded-lg border border-slate-800">
           {(["daily", "monthly", "yearly"] as TabKey[]).map((key) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`px-3 py-1 rounded text-xs font-medium transition ${
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
                 activeTab === key
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                  : "text-slate-400 hover:text-slate-200"
               }`}
             >
               {tabLabels[key]}
@@ -124,23 +124,25 @@ export default function AnalyticsChart() {
       </div>
 
       {loading && (
-        <div className="text-sm text-gray-400">Loading analytics data…</div>
+        <div className="flex h-32 items-center justify-center text-sm text-blue-400">
+           <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-t-2 border-blue-500 mr-3"></div> Loading analytics data…
+        </div>
       )}
 
       {error && (
-        <div className="text-sm text-red-400 bg-red-900/40 border border-red-700 px-3 py-2 rounded">
+        <div className="text-sm font-medium text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
       {!loading && !error && (
         <>
-          <div className="mb-3 text-xs text-gray-300 flex items-center justify-between">
+          <div className="mb-4 text-xs font-medium text-slate-300 flex items-center justify-between">
             <span>
-              Showing <span className="font-semibold">{tabLabels[activeTab]}</span>
+              Showing <span className="font-bold text-blue-400">{tabLabels[activeTab]}</span>
             </span>
-            <span>
-              Total views: <span className="font-semibold">{totalViews}</span>
+            <span className="bg-slate-900/60 px-3 py-1.5 rounded-full border border-slate-700/50">
+              Total views: <span className="font-bold text-white">{totalViews}</span>
             </span>
           </div>
 

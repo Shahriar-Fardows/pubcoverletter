@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Trash2, Plus, AlertCircle, CheckCircle } from "lucide-react"
+import { Trash2, Plus, AlertCircle, CheckCircle, ShieldBan, Flag, ChevronRight, ChevronLeft } from "lucide-react"
 
 type BlockedStudent = {
   _id: string
@@ -51,7 +51,7 @@ export default function BlockedStudentsPage() {
     setSuccess(null)
 
     if (!studentId.trim()) {
-      setError("Student ID দিতে হবে")
+      setError("Student ID is mandatory")
       setSubmitting(false)
       return
     }
@@ -72,21 +72,21 @@ export default function BlockedStudentsPage() {
         throw new Error(json.error || json.message || "Something went wrong")
       }
 
-      setSuccess(json.message || "Student blocked successfully")
+      setSuccess(json.message || "Access suspended successfully")
       setStudentId("")
       setReason("")
       await loadBlockedStudents()
       setCurrentPage(1)
     } catch (err) {
       console.error(err)
-      setError("Block add করতে সমস্যা হয়েছে")
+      setError("Failed to execute suspension")
     } finally {
       setSubmitting(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    const sure = window.confirm("এই student unblock করতে চান?")
+    const sure = window.confirm("Are you certain you wish to unblock this user?")
     if (!sure) return
 
     try {
@@ -100,182 +100,188 @@ export default function BlockedStudentsPage() {
       }
 
       setBlockedStudents((prev) => prev.filter((item) => item._id !== id))
-      setSuccess("Student unblocked successfully")
+      setSuccess("Suspension lifted successfully")
       setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
       console.error(err)
-      setError("Unblock করতে সমস্যা হয়েছে")
+      setError("Failed to lift suspension")
     }
   }
 
-  const totalPages = Math.ceil(blockedStudents.length / ITEMS_PER_PAGE)
+  const totalPages = Math.max(1, Math.ceil(blockedStudents.length / ITEMS_PER_PAGE))
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentData = blockedStudents.slice(startIndex, endIndex)
 
   return (
-    <div className=" bg-gray-900 text-white p-6">
-      <div className="">
-        {/* Header */}
-        <div className="mb-8">
-          <p className="text-gray-400">Manage blocked student list</p>
+    <div className="flex flex-col gap-6 w-full">
+      {/* Alert Messages */}
+      {error && (
+        <div className="animate-in fade-in flex items-center gap-3 rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-3 text-red-400">
+          <AlertCircle size={20} />
+          <p className="text-sm font-medium">{error}</p>
+        </div>
+      )}
+      {success && (
+        <div className="animate-in fade-in flex items-center gap-3 rounded-xl border border-emerald-500/50 bg-emerald-500/10 px-4 py-3 text-emerald-400">
+          <CheckCircle size={20} />
+          <p className="text-sm font-medium">{success}</p>
+        </div>
+      )}
+
+      {/* Form Section */}
+      <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-6 shadow-lg backdrop-blur-md">
+        <div className="mb-5 flex items-center gap-2 text-white">
+          <ShieldBan className="h-5 w-5 text-red-400" />
+          <h3 className="text-lg font-semibold tracking-wide">Suspend User Access</h3>
         </div>
 
-        {/* Alert Messages */}
-        {error && (
-          <div className="mb-4 bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg flex items-center gap-2">
-            <AlertCircle size={20} />
-            {error}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-slate-400">Student ID Target</label>
+            <input
+              type="text"
+              value={studentId}
+              onChange={(e) => setStudentId(e.target.value)}
+              className="w-full rounded-lg border border-slate-600 bg-slate-900/50 px-3 py-2 text-sm font-medium text-slate-200 outline-none transition-all placeholder:text-slate-600 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50"
+              placeholder="e.g. 2511086038"
+            />
           </div>
-        )}
-        {success && (
-          <div className="mb-4 bg-green-900 border border-green-700 text-green-200 px-4 py-3 rounded-lg flex items-center gap-2">
-            <CheckCircle size={20} />
-            {success}
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-slate-400">Suspension Reason <span className="opacity-50">(optional)</span></label>
+            <input
+              type="text"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="w-full rounded-lg border border-slate-600 bg-slate-900/50 px-3 py-2 text-sm font-medium text-slate-200 outline-none transition-all placeholder:text-slate-600 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50"
+              placeholder="e.g. Exploiting prints"
+            />
           </div>
-        )}
 
-        {/* Form Section */}
-        <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
-          <h2 className="text-xl font-bold mb-4">➕ Student Block করুন</h2>
+          <div className="flex items-end">
+             <button
+                onClick={handleAddBlock}
+                disabled={submitting}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white shadow-[0_0_15px_-3px_rgba(220,38,38,0.5)] transition hover:bg-red-500 disabled:opacity-50"
+              >
+                {submitting ? (
+                  "Enforcing..."
+                ) : (
+                  <>
+                     <Plus size={18} /> Execute Block
+                  </>
+                )}
+             </button>
+          </div>
+        </div>
+      </div>
 
-          <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">
-                  Student ID *
-                </label>
-                <input
-                  type="text"
-                  value={studentId}
-                  onChange={(e) => setStudentId(e.target.value)}
-                  className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                  placeholder="যেমন: 2511086038"
-                />
+      {/* Table Section */}
+      <div className="overflow-hidden rounded-xl border border-slate-700/80 bg-slate-900/70 shadow-2xl backdrop-blur-md">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full whitespace-nowrap text-left text-sm text-slate-300">
+            <thead className="bg-slate-800/80 text-xs uppercase text-slate-400 border-b border-slate-700">
+              <tr>
+                <th className="px-6 py-4 font-semibold tracking-wider">Student ID</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Logged Reason</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Restriction Date</th>
+                <th className="px-6 py-4 font-semibold tracking-wider text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-700/50">
+              {loading && blockedStudents.length === 0 ? (
+                <tr>
+                   <td colSpan={4} className="py-12 text-center text-slate-500">
+                     <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-red-500"></div>
+                     <p className="mt-3 font-medium">Loading restrictions...</p>
+                   </td>
+                </tr>
+              ) : currentData.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-16 text-center text-slate-500">
+                    <Flag className="inline-block mb-3 h-10 w-10 opacity-50 text-emerald-500" />
+                    <p className="font-medium text-lg text-emerald-400">All Clear.</p>
+                    <p className="mt-1 text-sm">No restrictions are currently enforced on the network.</p>
+                  </td>
+                </tr>
+              ) : (
+                currentData.map((item) => (
+                  <tr key={item._id} className="group hover:bg-slate-800/40 transition-colors">
+                    <td className="px-6 py-4 align-middle">
+                      <span className="font-mono font-medium text-slate-200">{item.studentId}</span>
+                    </td>
+                    <td className="px-6 py-4 align-middle">
+                      <span className="rounded bg-slate-800/60 px-2 py-1 text-xs font-medium text-slate-400 border border-slate-700/50">
+                        {item.reason || "Unspecified Offense"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 align-middle text-slate-400 text-xs group-hover:text-slate-300 transition-colors">
+                      {item.createdAt ? new Date(item.createdAt).toLocaleString("en-US", { dateStyle: 'medium', timeStyle: 'short' }) : "N/A"}
+                    </td>
+                    <td className="px-6 py-4 align-middle text-right">
+                       <button
+                          onClick={() => handleDelete(item._id)}
+                          className="inline-flex items-center justify-center rounded-lg bg-emerald-500/10 p-2 text-emerald-500 transition-colors hover:bg-emerald-500 hover:text-white"
+                          title="Lift Suspension"
+                        >
+                          <Trash2 size={16} />
+                       </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-slate-700/50 bg-slate-800/40 px-6 py-4">
+            <div className="hidden sm:block text-xs font-medium text-slate-400">
+              Displaying <span className="text-slate-200">{Math.min(endIndex, blockedStudents.length)}</span> active restrictions.
+            </div>
+            <div className="flex w-full sm:w-auto items-center justify-center gap-1">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-300"
+              >
+                <ChevronLeft size={16} /> Prev
+              </button>
+              
+              <div className="flex items-center gap-1 px-2">
+                {(() => {
+                  let start = Math.max(1, currentPage - 2);
+                  const end = Math.min(totalPages, start + 4);
+                  if (end - start < 4) start = Math.max(1, end - 4);
+
+                  return Array.from({ length: end - start + 1 }, (_, i) => start + i).map(p => (
+                   <button
+                     key={p}
+                     onClick={() => setCurrentPage(p)}
+                     className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold transition-all ${
+                       p === currentPage 
+                       ? "bg-red-600 text-white shadow-lg shadow-red-500/20 shadow-[inset_0_1px_rgba(255,255,255,0.2)]" 
+                       : "text-slate-400 hover:bg-slate-700 hover:text-white"
+                     }`}
+                   >
+                     {p}
+                   </button>
+                  ));
+                })()}
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">
-                  Name (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                  placeholder="যেমন: Cheating / Misuse"
-                />
-              </div>
-
-              <div className="flex items-end">
-                <button
-                  onClick={handleAddBlock}
-                  disabled={submitting}
-                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white font-semibold py-2 rounded transition flex items-center justify-center gap-2"
-                >
-                  <Plus size={18} />
-                  {submitting ? "Saving..." : "Block Add"}
-                </button>
-              </div>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-300"
+              >
+                Next <ChevronRight size={16} />
+              </button>
             </div>
           </div>
-        </div>
-
-        {/* Table Section */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-          {loading ? (
-            <div className="p-8 text-center text-gray-400">Loading...</div>
-          ) : blockedStudents.length === 0 ? (
-            <div className="p-8 text-center text-gray-400">কোনো blocked student নেই।</div>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-900 border-b border-gray-700">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Student ID</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Name</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Blocked At</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentData.map((item) => (
-                      <tr key={item._id} className="border-b border-gray-700 hover:bg-gray-700 transition">
-                        <td className="px-4 py-3 text-sm font-mono">{item.studentId}</td>
-                        <td className="px-4 py-3 text-sm text-gray-400">{item.reason || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-400">
-                          {item.createdAt ? new Date(item.createdAt).toLocaleString("bn-BD") : "-"}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => handleDelete(item._id)}
-                            className="p-2 bg-red-600 text-white rounded hover:bg-red-700 transition inline-flex"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="bg-gray-900 border-t border-gray-700 px-4 py-4">
-                  <div className="flex items-center justify-center gap-3">
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                      className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-semibold"
-                    >
-                      ← Prev
-                    </button>
-
-                    <div className="flex gap-1">
-                      {(() => {
-                        const pageWindow = 5
-                        let startPage = Math.max(1, currentPage - Math.floor(pageWindow / 2))
-                        const endPage = Math.min(totalPages, startPage + pageWindow - 1)
-                        
-                        if (endPage - startPage + 1 < pageWindow) {
-                          startPage = Math.max(1, endPage - pageWindow + 1)
-                        }
-
-                        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(page => (
-                          <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`px-2.5 py-1.5 rounded text-sm font-semibold transition ${
-                              page === currentPage
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        ))
-                      })()}
-                    </div>
-
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                      className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-semibold"
-                    >
-                      Next →
-                    </button>
-
-                    <div className="ml-4 text-sm text-gray-400">
-                      Page {currentPage} of {totalPages}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+        )}
       </div>
     </div>
   )
