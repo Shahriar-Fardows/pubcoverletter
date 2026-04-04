@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     const base64Content = pdfDataUri.split(",")[1] || pdfDataUri;
 
     // Send Email
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const fromEmail = process.env.RESEND_FROM_EMAIL || (process.env.RESEND_DOMAIN ? `resumes@${process.env.RESEND_DOMAIN}` : "onboarding@resend.dev");
     
     const { data, error } = await resend.emails.send({
       from: `Resume Builder <${fromEmail}>`,
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       html: `<p>Hello!</p><p>Please find the generated resume for <b>${studentName || "the candidate"}</b> attached to this email.</p><br/><i>Auto-generated Document</i>`,
       attachments: [
         {
-          filename: `${studentName?.replace(/\s+/g, '_') || "Resume"}.jpeg`,
+          filename: `${studentName?.replace(/\s+/g, '_') || "Resume"}.pdf`,
           content: base64Content,
         },
       ],
