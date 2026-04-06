@@ -1738,19 +1738,19 @@ function ResumeDocument({
         <SideSection title="Contact" primary={p} heading={h}>
           {[
             data.basicInfo.email && {
-              icon: <Mail size={11} />,
+              icon: <Mail size={12} />,
               val: data.basicInfo.email,
             },
             data.basicInfo.phone && {
-              icon: <Phone size={11} />,
+              icon: <Phone size={12} />,
               val: data.basicInfo.phone,
             },
             data.basicInfo.address && {
-              icon: <MapPin size={11} />,
+              icon: <MapPin size={12} />,
               val: data.basicInfo.address,
             },
             data.basicInfo.website && {
-              icon: <ExternalLink size={11} />,
+              icon: <ExternalLink size={12} />,
               val: data.basicInfo.website,
               color: p,
             },
@@ -1762,17 +1762,26 @@ function ResumeDocument({
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
-                  gap: 6,
-                  marginBottom: 6,
+                  gap: 8,
+                  marginBottom: 8,
+                  lineHeight: 1.4,
                 }}
               >
-                <span style={{ color: p, marginTop: 1, flexShrink: 0 }}>
+                <span
+                  style={{
+                    color: p,
+                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    marginTop: 2,
+                  }}
+                >
                   {item.icon}
                 </span>
                 <span
                   style={{
                     fontSize: 11,
-                    lineHeight: "1.5",
+                    lineHeight: 1.5,
                     wordBreak: "break-all",
                     color: item.color || t,
                   }}
@@ -1959,13 +1968,24 @@ function ResumeDocument({
                     style={{
                       fontSize: 10,
                       color: p,
-                      marginTop: 3,
+                      marginTop: 4,
                       display: "flex",
-                      alignItems: "center",
-                      gap: 3,
+                      alignItems: "flex-start",
+                      gap: 4,
+                      lineHeight: 1.5,
                     }}
                   >
-                    <Link2 size={10} /> {exp.link}
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexShrink: 0,
+                        marginTop: 1,
+                      }}
+                    >
+                      <Link2 size={10} />
+                    </span>
+                    <span style={{ wordBreak: "break-all" }}>{exp.link}</span>
                   </p>
                 )}
               </div>
@@ -2008,11 +2028,22 @@ function ResumeDocument({
                         fontSize: 10,
                         color: p,
                         display: "flex",
-                        alignItems: "center",
-                        gap: 3,
+                        alignItems: "flex-start",
+                        gap: 4,
+                        lineHeight: 1.4,
                       }}
                     >
-                      <Link2 size={9} /> View
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          flexShrink: 0,
+                          marginTop: 1,
+                        }}
+                      >
+                        <Link2 size={9} />
+                      </span>
+                      <span>View</span>
                     </span>
                   )}
                 </div>
@@ -2320,14 +2351,22 @@ function MainSection({
       <div
         style={{
           display: "flex",
-          alignItems: "center",
-          gap: 7,
+          alignItems: "flex-start",
+          gap: 8,
           borderBottom: `1.5px solid ${primary}20`,
-          paddingBottom: 7,
-          marginBottom: 12,
+          paddingBottom: 8,
+          marginBottom: 14,
         }}
       >
-        <span style={{ color: primary, display: "flex", alignItems: "center" }}>
+        <span
+          style={{
+            color: primary,
+            display: "flex",
+            alignItems: "center",
+            flexShrink: 0,
+            marginTop: 1,
+          }}
+        >
           {icon}
         </span>
         <p
@@ -2338,6 +2377,7 @@ function MainSection({
             letterSpacing: "0.1em",
             color: heading,
             margin: 0,
+            lineHeight: 1.3,
           }}
         >
           {title}
