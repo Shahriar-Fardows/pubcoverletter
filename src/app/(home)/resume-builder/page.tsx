@@ -1763,7 +1763,6 @@ function ResumeDocument({
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
-                  gap: 8,
                   marginBottom: 8,
                   lineHeight: 1.4,
                 }}
@@ -1772,9 +1771,9 @@ function ResumeDocument({
                   style={{
                     color: p,
                     flexShrink: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    marginTop: 2,
+                    width: 18,
+                    display: "inline-flex",
+                    paddingTop: 1.5,
                   }}
                 >
                   {item.icon}
@@ -1785,6 +1784,7 @@ function ResumeDocument({
                     lineHeight: 1.5,
                     wordBreak: "break-all",
                     color: item.color || t,
+                    flex: 1,
                   }}
                 >
                   {item.val}
@@ -1800,7 +1800,7 @@ function ResumeDocument({
               {data.skills.map((s, i) => (
                 <div
                   key={i}
-                  style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  style={{ display: "flex", alignItems: "center" }}
                 >
                   <span
                     style={{
@@ -1809,9 +1809,10 @@ function ResumeDocument({
                       borderRadius: "50%",
                       background: p,
                       flexShrink: 0,
+                      marginRight: 6,
                     }}
                   ></span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: t }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: t, flex: 1 }}>
                     {s}
                   </span>
                 </div>
@@ -1943,7 +1944,6 @@ function ResumeDocument({
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
-                        gap: 6,
                         marginBottom: 2,
                       }}
                     >
@@ -1951,14 +1951,15 @@ function ResumeDocument({
                         style={{
                           color: p,
                           fontSize: 10,
-                          marginTop: 3,
+                          width: 12,
+                          paddingTop: 1.5,
                           flexShrink: 0,
                         }}
                       >
                         •
                       </span>
                       <span
-                        style={{ fontSize: 11, color: t, lineHeight: "1.6" }}
+                        style={{ fontSize: 11, color: t, lineHeight: "1.6", flex: 1 }}
                       >
                         {line}
                       </span>
@@ -1972,21 +1973,20 @@ function ResumeDocument({
                       marginTop: 4,
                       display: "flex",
                       alignItems: "flex-start",
-                      gap: 4,
                       lineHeight: 1.5,
                     }}
                   >
                     <span
                       style={{
-                        display: "flex",
-                        alignItems: "center",
+                        display: "inline-flex",
+                        width: 14,
                         flexShrink: 0,
-                        marginTop: 1,
+                        paddingTop: 1.5,
                       }}
                     >
                       <Link2 size={10} />
                     </span>
-                    <span style={{ wordBreak: "break-all" }}>{exp.link}</span>
+                    <span style={{ wordBreak: "break-all", flex: 1 }}>{exp.link}</span>
                   </p>
                 )}
               </div>
@@ -2057,7 +2057,6 @@ function ResumeDocument({
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
-                        gap: 6,
                         marginBottom: 2,
                       }}
                     >
@@ -2065,14 +2064,15 @@ function ResumeDocument({
                         style={{
                           color: p,
                           fontSize: 10,
-                          marginTop: 3,
+                          width: 12,
+                          paddingTop: 1.5,
                           flexShrink: 0,
                         }}
                       >
                         •
                       </span>
                       <span
-                        style={{ fontSize: 11, color: t, lineHeight: "1.6" }}
+                        style={{ fontSize: 11, color: t, lineHeight: "1.6", flex: 1 }}
                       >
                         {line}
                       </span>
@@ -2179,12 +2179,12 @@ function ResumeDocument({
               {data.certifications.map((cert) => (
                 <div
                   key={cert.id}
-                  style={{ display: "flex", alignItems: "flex-start", gap: 5 }}
+                  style={{ display: "flex", alignItems: "flex-start" }}
                 >
-                  <span style={{ color: p, fontSize: 10, marginTop: 3 }}>
+                  <span style={{ color: p, fontSize: 10, width: 12, paddingTop: 1.5, flexShrink: 0 }}>
                     •
                   </span>
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <p
                       style={{
                         fontSize: 11,
@@ -2232,7 +2232,6 @@ function ResumeDocument({
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
-                        gap: 6,
                         marginBottom: 3,
                       }}
                     >
@@ -2240,14 +2239,15 @@ function ResumeDocument({
                         style={{
                           color: p,
                           fontSize: 10,
-                          marginTop: 3,
+                          width: 12,
+                          paddingTop: 1.5,
                           flexShrink: 0,
                         }}
                       >
                         •
                       </span>
                       <span
-                        style={{ fontSize: 11, color: t, lineHeight: "1.6" }}
+                        style={{ fontSize: 11, color: t, lineHeight: "1.6", flex: 1 }}
                       >
                         {line}
                       </span>
@@ -2353,7 +2353,6 @@ function MainSection({
         style={{
           display: "flex",
           alignItems: "flex-start",
-          gap: 8,
           borderBottom: `1.5px solid ${primary}20`,
           paddingBottom: 8,
           marginBottom: 14,
@@ -2362,10 +2361,10 @@ function MainSection({
         <span
           style={{
             color: primary,
-            display: "flex",
-            alignItems: "center",
+            width: 22,
+            display: "inline-flex",
             flexShrink: 0,
-            marginTop: 1,
+            paddingTop: 1,
           }}
         >
           {icon}
