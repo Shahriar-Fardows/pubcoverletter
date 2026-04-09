@@ -20,6 +20,7 @@ export default function StudentFilter() {
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
@@ -189,7 +190,7 @@ export default function StudentFilter() {
       });
       setSelected(new Set());
       await fetchStudents();
-    } catch (error) {
+    } catch (error) { // eslint-disable-line @typescript-eslint/no-unused-vars
       Swal.fire({
         title: 'Error', 
         text: 'Failed to purge data.', 
@@ -317,7 +318,7 @@ export default function StudentFilter() {
               className="w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-sm font-medium text-slate-300 outline-none transition-all focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50"
             >
               <option value="all">All Time</option>
-              <option value="today">Today's Data Only</option>
+              <option value="today">Today&apos;s Data Only</option>
               <option value="yesterday">Yesterday</option>
               <option value="last7">Last 7 Days</option>
             </select>

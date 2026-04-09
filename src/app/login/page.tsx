@@ -39,7 +39,7 @@ export default function LoginPage() {
       });
 
       router.push("/resume-builder");
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       Swal.fire({
         icon: "error",
         title: "Login Error",
@@ -105,7 +105,7 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-400">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="font-semibold text-blue-400 hover:text-blue-300">
             Sign up
           </Link>

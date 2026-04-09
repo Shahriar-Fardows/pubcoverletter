@@ -1,0 +1,63 @@
+
+> pubcoverletter@0.1.0 lint
+> eslint
+
+
+D:\Shahriar\extention\pubcoverletter\src\app\(home)\resume-builder\page.tsx
+   189:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+   288:10  warning  'SectionHeading' is defined but never used                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   363:48  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   364:32  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   366:28  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   366:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   367:67  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   369:24  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   369:39  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   374:9   warning  'shapeClass' is assigned a value but never used                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   415:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   453:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   506:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   660:54  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   672:48  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1717:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  1759:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  2298:3   warning  'heading' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+
+D:\Shahriar\extention\pubcoverletter\src\app\admin\page.tsx
+   10:3   warning  'LineChart' is defined but never used                                                                             @typescript-eslint/no-unused-vars
+   11:3   warning  'Line' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+   16:3   warning  'Legend' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+   45:10  warning  'students' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+   61:6   warning  React Hook useEffect has a missing dependency: 'fetchStudents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  251:71  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+
+D:\Shahriar\extention\pubcoverletter\src\app\api\resumes\email\route.ts
+   28:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  209:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Shahriar\extention\pubcoverletter\src\app\login\page.tsx
+   42:19  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  108:14  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\Shahriar\extention\pubcoverletter\src\app\register\page.tsx
+  43:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Shahriar\extention\pubcoverletter\src\components\feedback-form\FeedbackForm.tsx
+  87:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Shahriar\extention\pubcoverletter\src\components\resume-analytics\resumeAnalytics.tsx
+  2:33  warning  'CheckSquare' is defined but never used  @typescript-eslint/no-unused-vars
+  2:46  warning  'Square' is defined but never used       @typescript-eslint/no-unused-vars
+  2:54  warning  'Trash2' is defined but never used       @typescript-eslint/no-unused-vars
+
+D:\Shahriar\extention\pubcoverletter\src\components\student-filter\studentFilter.tsx
+   23:10  warning  'isRefreshing' is assigned a value but never used                @typescript-eslint/no-unused-vars
+   23:24  warning  'setIsRefreshing' is assigned a value but never used             @typescript-eslint/no-unused-vars
+  192:14  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
+  320:42  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\Shahriar\extention\pubcoverletter\src\lib\mongodb.ts
+  17:11  warning  'db' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Ô£û 38 problems (19 errors, 19 warnings)
+
