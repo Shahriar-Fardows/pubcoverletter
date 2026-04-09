@@ -84,7 +84,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ initialChallenge }) => {
           text: data.error || "Something went wrong. Please try again.",
         });
       }
-    } catch (error) {
+    } catch (error) { // eslint-disable-line @typescript-eslint/no-unused-vars
       Swal.fire({
         icon: "error",
         title: "Network error",

@@ -25,6 +25,7 @@ export async function POST(req: Request) {
     let metrics = await metricsCollection.findOne({ month: currentYearMonth });
     if (!metrics) {
       await metricsCollection.insertOne({ month: currentYearMonth, count: 0 });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       metrics = { month: currentYearMonth, count: 0 } as any;
     }
 
@@ -206,7 +207,7 @@ export async function POST(req: Request) {
       { message: "Email dispatched successfully!", id: data?.id },
       { status: 200 },
     );
-  } catch (err: any) {
+  } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     console.error("Email API Route Error:", err);
     return NextResponse.json(
       { error: "Internal Server Error", details: err.message },

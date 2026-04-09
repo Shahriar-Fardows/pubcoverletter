@@ -40,7 +40,7 @@ export default function RegisterPage() {
       }).then(() => {
         router.push("/login");
       });
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       Swal.fire({
         icon: "error",
         title: "Registration Error",

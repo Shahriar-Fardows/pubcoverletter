@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FileText, ShieldAlert, CheckSquare, Square, Trash2 } from "lucide-react";
+import { FileText, ShieldAlert } from "lucide-react";
 
 type ResumeEntry = {
   _id: string;

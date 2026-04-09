@@ -7,13 +7,10 @@ import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   Area,
   AreaChart,
@@ -42,6 +39,7 @@ interface MonthlyData {
 export default function AdminPortal() {
   const API_URL = "/api/students";
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -58,6 +56,7 @@ export default function AdminPortal() {
 
   useEffect(() => {
     fetchStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchStudents = async () => {
@@ -248,7 +247,7 @@ export default function AdminPortal() {
                 <div className="absolute top-0 right-0 p-4 opacity-10 text-blue-300">
                   <CalendarDays className="h-24 w-24" />
                 </div>
-                <p className="text-sm font-medium text-blue-400">Today's Prints</p>
+                <p className="text-sm font-medium text-blue-400">Today&apos;s Prints</p>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-4xl font-extrabold text-white">{todayPrints}</span>
                   <span className="text-xs font-medium text-blue-400 bg-blue-400/10 px-2 py-1 rounded-full">New</span>

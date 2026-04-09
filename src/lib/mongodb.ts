@@ -14,7 +14,7 @@ export async function connectDB() {
   }
 
   try {
-    const db = await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI);
 
     isConnected = true;
     console.log("✅ MongoDB Connected");
