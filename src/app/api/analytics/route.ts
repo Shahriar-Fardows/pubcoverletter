@@ -12,7 +12,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Path is required" }, { status: 400 });
     }
 
-    await connectDB();
+    const connected = await connectDB();
+    if (!connected) {
+      return NextResponse.json({ message: "Analytics skipped (No DB)" });
+    }
 
     const db = mongoose.connection.db!;
     const collection = db.collection("pageviews");

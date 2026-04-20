@@ -34,7 +34,7 @@ export function Navbar({
         <div className="flex justify-between items-center h-20">
           {/* Brand/Logo */}
           <div className="flex-shrink-0 flex items-center gap-2">
-            <Image src={logoImage} alt="Logo" width={50} height={50} className="rounded" />
+            <Image src={logoImage} alt="Logo" width={50} height={50} className="rounded" style={{ width: "auto", height: "auto" }} />
           </div>
 
           {/* Desktop Navigation */}

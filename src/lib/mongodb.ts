@@ -2,15 +2,16 @@ import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
-if (!MONGODB_URI) {
-  throw new Error("❌ MONGODB_URI is missing in .env.local");
-}
-
 let isConnected = false;
 
 export async function connectDB() {
   if (isConnected) {
-    return;
+    return true;
+  }
+
+  if (!MONGODB_URI) {
+    console.warn("⚠️ MONGODB_URI is missing in .env.local. Database connection skipped.");
+    return false;
   }
 
   try {
@@ -18,8 +19,9 @@ export async function connectDB() {
 
     isConnected = true;
     console.log("✅ MongoDB Connected");
+    return true;
   } catch (error) {
     console.error("❌ MongoDB Connection Error:", error);
-    throw error;
+    return false;
   }
 }
