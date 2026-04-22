@@ -5,7 +5,9 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
+    const connected = await connectDB();
+
+    if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
     const { name, email, password } = await req.json();
 
     if (!name || !email || !password) {

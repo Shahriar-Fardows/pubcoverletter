@@ -116,6 +116,16 @@ export default function AdminPortal() {
 
     const dailyArray: MonthlyData[] = Object.entries(dayMap)
       .map(([date, count]) => ({ date, prints: count }))
+      .filter((item) => {
+        if (!item.date || !item.date.includes("/")) return false;
+        const parts = item.date.split("/");
+        if (parts.length !== 3) return false;
+        
+        const year = parseInt(parts[2], 10);
+        const currentYear = new Date().getFullYear();
+        // Sanity check to avoid rendering future dates or totally corrupted years
+        return !isNaN(year) && year >= 2023 && year <= currentYear;
+      })
       .sort((a, b) => {
         try {
           const dateA = new Date(a.date.split("/").reverse().join("-")).getTime();

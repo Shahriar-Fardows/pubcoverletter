@@ -16,7 +16,9 @@ const MAX_EMAILS_PER_MONTH = 3000;
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
+    const connected = await connectDB();
+
+    if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
 
     // Rate Limiting Logic (3000 max/month)
     const currentYearMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"

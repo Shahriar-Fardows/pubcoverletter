@@ -6,7 +6,9 @@ const getResumeCollection = () => mongoose.connection.collection("generated_resu
 
 export async function GET(request: Request) {
   try {
-    await connectDB();
+    const connected = await connectDB();
+
+    if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
     const { searchParams } = new URL(request.url);
 
     // Sorting
@@ -31,7 +33,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
+    const connected = await connectDB();
+
+    if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
     const body = await request.json();
 
     if (!body || !body.studentName) {

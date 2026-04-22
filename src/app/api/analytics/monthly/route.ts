@@ -3,7 +3,9 @@ import { connectDB } from "@/lib/mongodb";
 import mongoose from "mongoose";
 
 export async function GET() {
-  await connectDB();
+  const connected = await connectDB();
+
+  if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
   const data = await mongoose.connection.db!
     .collection("pageviews")
     .find({ type: "monthly" })

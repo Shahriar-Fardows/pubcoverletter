@@ -26,7 +26,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     e.preventDefault();
     setError('');
 
-    if (password === todayDate) {
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || todayDate;
+    if (password === adminPassword) {
       setIsAuthenticated(true);
       setPassword('');
       // Store in session (not localStorage for security)

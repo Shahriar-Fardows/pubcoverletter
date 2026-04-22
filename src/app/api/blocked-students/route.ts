@@ -17,7 +17,9 @@ interface BlockPayload {
 ====================================================== */
 export async function GET(request: Request) {
   try {
-    await connectDB()
+    const connected = await connectDB();
+
+    if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
 
     const { searchParams } = new URL(request.url)
     const studentId = searchParams.get("studentId")
@@ -53,7 +55,9 @@ export async function GET(request: Request) {
 ====================================================== */
 export async function POST(request: Request) {
   try {
-    await connectDB()
+    const connected = await connectDB();
+
+    if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
 
     const body = await request.json()
 
@@ -108,7 +112,9 @@ export async function POST(request: Request) {
 ====================================================== */
 export async function DELETE(request: Request) {
   try {
-    await connectDB()
+    const connected = await connectDB();
+
+    if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")
