@@ -19,7 +19,7 @@ export async function connectDB() {
       mongoose.connection.once("connected", resolve);
       mongoose.connection.once("error", reject);
     });
-    return mongoose.connection.readyState === 1;
+    return (mongoose.connection.readyState as number) === 1;
   }
 
   try {
