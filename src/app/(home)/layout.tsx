@@ -3,7 +3,7 @@ import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
 import Script from "next/script";
 import { Navbar } from "@/components/navbar/navbar";
-// import OncePopup from "@/components/once-popup/OncePopup";
+import DomainSwitchPopup from "@/components/once-popup/DomainSwitchPopup";
 import Tracker from "@/components/analytics/page";
 
 const inter = Inter({
@@ -41,11 +41,14 @@ export const metadata: Metadata = {
     title: "Presidency University Cover Page Generator",
     description:
       "Generate your PU cover page instantly from multiple modern templates.",
-    url: "https://pubcoverletter.netlify.app/",
+    url: "https://pubcoverletter.vercel.app/",
     siteName: "Presidency University Cover Page Generator",
     type: "website",
   },
   robots: "index, follow",
+  verification: {
+    google: "PXX_f9iR_A2v6vW0tHkKbBOIgQs4aSFJp37Oxa-isFc",
+  },
 };
 
 export default function RootLayout({
@@ -72,6 +75,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         <Navbar />
+        <DomainSwitchPopup />
         {/* <OncePopup /> */}
         <Tracker />
         {children}
