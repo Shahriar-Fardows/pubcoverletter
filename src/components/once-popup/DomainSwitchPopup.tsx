@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-const STORAGE_KEY = "domain_switch_popup_closed";
-
 export default function DomainSwitchPopup() {
   const [isOpen, setIsOpen] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -14,81 +13,79 @@ export default function DomainSwitchPopup() {
     // Check if we are on the Netlify domain
     const isNetlify = window.location.hostname.includes("netlify.app");
     
-    // Check if already closed in this session
-    const alreadyClosed = sessionStorage.getItem(STORAGE_KEY);
-
-    if (isNetlify && !alreadyClosed) {
+    if (isNetlify) {
       setIsOpen(true);
+      
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            window.location.href = "https://pubcoverletter.vercel.app/";
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
     }
   }, []);
-
-  const handleClose = () => {
-    setIsOpen(false);
-    sessionStorage.setItem(STORAGE_KEY, "true");
-  };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl border border-red-100">
+      <div className="relative w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl border border-red-100 text-center">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4 text-red-600">
-          <div className="p-2 bg-red-50 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        <div className="flex flex-col items-center gap-3 mb-6 text-red-600">
+          <div className="p-3 bg-red-50 rounded-full animate-bounce">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
           </div>
-          <h2 className="text-xl font-bold">ডোমেইন পরিবর্তন সংক্রান্ত নোটিশ</h2>
+          <h2 className="text-2xl font-bold">ডোমেইন পরিবর্তন সংক্রান্ত নোটিশ</h2>
         </div>
 
         {/* Content */}
-        <div className="space-y-4 text-slate-700 leading-relaxed">
-          <p className="font-medium text-lg">
-            প্রিয় ইউজার, প্রতি মাসে সাইটে প্রচুর ট্রাফিক বেড়ে যাওয়ার কারণে আমরা নতুন ডোমেইনে সুইচ করেছি।
-          </p>
+        <div className="space-y-6 text-slate-700 leading-relaxed">
+          <div className="space-y-2">
+            <p className="font-semibold text-xl">
+              আমাদের সাইটটি স্থায়ীভাবে নতুন ঠিকানায় চলে গেছে।
+            </p>
+            <p className="text-slate-500">
+              পুরানো এই ডোমেইনটি শীঘ্রই বন্ধ হয়ে যাবে।
+            </p>
+          </div>
           
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-            <p className="text-sm font-semibold text-blue-800 mb-1">আমাদের নতুন ঠিকানা:</p>
+          <div className="bg-blue-50 border border-blue-100 p-5 rounded-2xl">
+            <p className="text-sm font-medium text-blue-800 mb-2">নতুন ঠিকানা:</p>
             <Link 
               href="https://pubcoverletter.vercel.app/" 
-              className="text-blue-600 hover:underline font-bold break-all"
+              className="text-blue-600 hover:underline font-bold text-lg break-all"
             >
               https://pubcoverletter.vercel.app/
             </Link>
           </div>
 
-          <p className="text-sm">
-            নেটলিফিতে (Netlify) আমাদের বিলিং ক্রেডিট অনেক দ্রুত শেষ হয়ে যাচ্ছে, তাই স্থায়ীভাবে আমরা ভার্সেলে (Vercel) চলে যাচ্ছি। 
-          </p>
-          
-          <p className="text-sm italic text-slate-500">
-            * যদি নতুন ডোমেইনে কোনো সমস্যা ফেস করেন, তবে এই ডোমেইনে এসে কাজ চালিয়ে নিতে পারবেন। তবে আমরা রিকমেন্ড করছি নতুন ডোমেইনটি ব্যবহার করার জন্য।
-          </p>
+          <div className="py-2">
+            <p className="text-sm font-medium text-slate-600">
+              আপনাকে অটোমেটিক নতুন সাইটে নিয়ে যাওয়া হচ্ছে...
+            </p>
+            <div className="mt-3 text-4xl font-black text-black">
+              {countdown}
+            </div>
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex flex-col gap-3">
+        <div className="mt-8">
           <Link 
             href="https://pubcoverletter.vercel.app/"
-            className="w-full bg-black text-white text-center py-3 rounded-xl font-semibold hover:bg-slate-800 transition-all shadow-lg shadow-black/20"
+            className="w-full block bg-black text-white text-center py-4 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-black/20"
           >
-            নতুন সাইটে যান 🚀
+            এখনই নতুন সাইটে যান 🚀
           </Link>
-          <button
-            onClick={handleClose}
-            className="w-full bg-slate-100 text-slate-600 py-3 rounded-xl font-medium hover:bg-slate-200 transition-all"
-          >
-            বন্ধ করুন
-          </button>
         </div>
-
-        {/* Close Icon */}
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
       </div>
     </div>
   );
 }
+
