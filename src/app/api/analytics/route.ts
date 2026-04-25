@@ -17,7 +17,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Analytics skipped (No DB)" });
     }
 
-    const db = mongoose.connection.db!;
+    if (!mongoose.connection.db) {
+      return NextResponse.json({ message: "Analytics skipped (DB not ready)" });
+    }
+    const db = mongoose.connection.db;
     const collection = db.collection("pageviews");
 
     const now = new Date();

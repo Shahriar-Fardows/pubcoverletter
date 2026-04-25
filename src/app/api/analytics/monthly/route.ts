@@ -3,14 +3,19 @@ import { connectDB } from "@/lib/mongodb";
 import mongoose from "mongoose";
 
 export async function GET() {
-  const connected = await connectDB();
+  try {
+    const connected = await connectDB();
+    if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
 
-  if (!connected) return NextResponse.json({ data: [], total: 0, message: "Database not connected" }, { status: 200 });
-  const data = await mongoose.connection.db!
-    .collection("pageviews")
-    .find({ type: "monthly" })
-    .sort({ date: -1 })
-    .toArray();
+    const data = await mongoose.connection.db!
+      .collection("pageviews")
+      .find({ type: "monthly" })
+      .sort({ date: -1 })
+      .toArray();
 
-  return NextResponse.json(data);
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Analytics Monthly Error:", error);
+    return NextResponse.json({ data: [], message: "Internal server error" }, { status: 500 });
+  }
 }
