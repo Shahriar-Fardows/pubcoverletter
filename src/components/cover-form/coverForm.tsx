@@ -3,6 +3,12 @@
 import React, { useState } from "react"
 import { Upload, FileUp, RotateCcw } from "lucide-react"
 import type { CoverFormValues } from "@/components/cover-form/typs"
+import ContributorThankYouPopup from "@/components/once-popup/ContributorThankYouPopup"
+import {
+  getContributorToThank,
+  markContributorThanked,
+  type Contributor,
+} from "@/components/once-popup/contributors"
 
 type TemplateId = "basic" | "formal"
 
@@ -20,6 +26,17 @@ const CoverForm: React.FC<CoverFormProps> = ({
   const [isOther, setIsOther] = useState(false)
   const [loading, setLoading] = useState(false)
   const [resetClicked, setResetClicked] = useState(false)
+
+  // 🤍 Contributor der jonno one-time thank you popup
+  const [thankYou, setThankYou] = useState<{
+    studentId: string
+    contributor: Contributor
+  } | null>(null)
+
+  const handleThankYouClose = () => {
+    if (thankYou) markContributorThanked(thankYou.studentId)
+    setThankYou(null)
+  }
 
   // 🔒 ব্লকড কিনা চেক করার helper (কিন্তু UI তে কিছু দেখাবে না)
   const isStudentBlocked = async (studentId: string): Promise<boolean> => {
@@ -126,6 +143,12 @@ const CoverForm: React.FC<CoverFormProps> = ({
       // 👉 Preview system এ পাঠাচ্ছি (user বুঝবে না ব্লক কেসে কী হল)
       onGenerate(data)
 
+      // 🤍 Contributor hole ekbar thanks janabo (ei browser e ar dekhabe na)
+      const contributor = getContributorToThank(studentID)
+      if (contributor) {
+        setThankYou({ studentId: studentID.trim(), contributor })
+      }
+
       // ✅ Date Format: DD/MM/YYYY (DB er jonno)
       let formattedDate = ""
       if (submissionDate) {
@@ -202,6 +225,13 @@ const CoverForm: React.FC<CoverFormProps> = ({
 
   return (
     <div className="min-h-screen px-4">
+      {thankYou && (
+        <ContributorThankYouPopup
+          contributor={thankYou.contributor}
+          onClose={handleThankYouClose}
+        />
+      )}
+
       <div className="mx-auto">
         <div className="bg-[#f8f9fa] backdrop-blur-sm rounded-[2px] border border-zinc-200">
           <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-8">

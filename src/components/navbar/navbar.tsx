@@ -21,6 +21,7 @@ interface NavbarProps {
 export function Navbar({
   links = [
     { label: "Cover Page", href: "/" },
+    { label: "Request Design", href: "/design-request" },
     { label: "Resume Builder", href: "/resume-builder" },
     { label: "Web Share", href: "/web-share" },
     { label: "AI Resume Analyzer", href: "/ai-resume-analyzer" },

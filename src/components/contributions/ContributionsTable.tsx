@@ -1,4 +1,5 @@
 import type React from "react";
+import Link from "next/link";
 
 type Contribution = {
   name: string;
@@ -66,6 +67,17 @@ const ContributionsTable: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      <p className="mt-4 text-sm text-gray-600">
+        Want your own design on this list?{" "}
+        <Link
+          href="/design-request"
+          className="font-semibold text-black underline underline-offset-2 hover:no-underline"
+        >
+          Request a cover page template
+        </Link>{" "}
+        — we&apos;ll publish it under your name.
+      </p>
     </div>
   );
 };
