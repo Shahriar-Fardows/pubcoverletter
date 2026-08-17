@@ -1,4 +1,3 @@
-import ContributionsTable from "@/components/contributions/ContributionsTable";
 import FeedbackForm from "@/components/feedback-form/FeedbackForm";
 
 type Challenge = {
@@ -16,9 +15,8 @@ export default function FeedbackPage() {
   const initialChallenge = generateChallenge(); // 🔹 server side-e generate
 
   return (
-    <div className="min-h-[70vh] container mx-auto flex flex-col items-center justify-center">
+    <div className="min-h-[70vh] container mx-auto flex items-center justify-center">
       <FeedbackForm initialChallenge={initialChallenge} />
-      <ContributionsTable />
     </div>
   );
 }

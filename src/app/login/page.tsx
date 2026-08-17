@@ -38,7 +38,7 @@ export default function LoginPage() {
         confirmButtonColor: "#3b82f6",
       });
 
-      router.push("/resume-builder");
+      router.push("/");
     } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       Swal.fire({
         icon: "error",
