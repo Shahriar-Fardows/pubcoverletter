@@ -11,7 +11,7 @@ const CONTRIBUTIONS: Contribution[] = [
   {
     name: "Piter Kubi",
     suggestion:
-      "Cover page er date year/month/date format e chilo — most faculties date/month/year (DD/MM/YYYY) chay.",
+      "Reported that the submission date printed as YYYY/MM/DD, while most faculties expect the DD/MM/YYYY format.",
     status: "Fixed",
   },
 ];
