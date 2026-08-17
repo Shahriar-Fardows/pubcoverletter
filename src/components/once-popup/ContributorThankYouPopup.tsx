@@ -36,8 +36,10 @@ const ContributorThankYouPopup: React.FC<ContributorThankYouPopupProps> = ({
         </p>
 
         <p className="mb-6 rounded-lg bg-indigo-50 px-4 py-3 text-sm font-medium text-indigo-800">
-          তোমার নাম Contributions লিস্টে যোগ করা হয়েছে। আবার কোনো ডিজাইন বা
-          আইডিয়া থাকলে নির্দ্বিধায় পাঠিয়ে দিও — আমরা অপেক্ষায় আছি! ✨
+          {contributor.result ??
+            "তোমার নাম Contributions লিস্টে যোগ করা হয়েছে।"}{" "}
+          আবার কোনো ডিজাইন বা আইডিয়া থাকলে নির্দ্বিধায় পাঠিয়ে দিও — আমরা
+          অপেক্ষায় আছি! ✨
         </p>
 
         <button

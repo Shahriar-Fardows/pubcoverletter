@@ -1,8 +1,10 @@
 export type Contributor = {
   /** Optional — jana thakle popup e naam dhore thanks bolbo */
   name?: string;
-  /** Ei student ta ki contribute korse */
+  /** Ei student ta ki contribute korse — "... er jonno tomake dhonnobad" hoye bosbe */
   contribution: string;
+  /** Optional — tar suggestion e ki kaj hoyese, popup er highlight box e dekhabe */
+  result?: string;
 };
 
 /**
@@ -12,7 +14,10 @@ export type Contributor = {
  */
 export const CONTRIBUTORS: Record<string, Contributor> = {
   "251494038": {
-    contribution: "নতুন কভার পেজ ডিজাইন রিকোয়েস্ট করার জন্য",
+    contribution:
+      "কভার পেজের ডেট ফরম্যাটের সমস্যাটা ধরিয়ে দেওয়ার জন্য",
+    result:
+      "তোমার কথামতো ডেট এখন DD/MM/YYYY ফরম্যাটে দেখাচ্ছে ✅ — যেভাবে বেশিরভাগ ফ্যাকাল্টি চান। তোমার নাম Contributions লিস্টেও যোগ করা হয়েছে।",
   },
 };
 
