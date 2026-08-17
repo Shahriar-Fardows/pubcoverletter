@@ -14,10 +14,8 @@ export type Contributor = {
  */
 export const CONTRIBUTORS: Record<string, Contributor> = {
   "251494038": {
-    contribution:
-      "কভার পেজের ডেট ফরম্যাটের সমস্যাটা ধরিয়ে দেওয়ার জন্য",
-    result:
-      "তোমার কথামতো ডেট এখন DD/MM/YYYY ফরম্যাটে দেখাচ্ছে ✅ — যেভাবে বেশিরভাগ ফ্যাকাল্টি চান। তোমার নাম Contributions লিস্টেও যোগ করা হয়েছে।",
+    contribution: "ডেট ফরম্যাটের সমস্যাটা ধরিয়ে দেওয়ার জন্য",
+    result: "ডেট এখন DD/MM/YYYY ফরম্যাটে দেখাচ্ছে ✅",
   },
 };
 

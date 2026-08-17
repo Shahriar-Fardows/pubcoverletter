@@ -24,29 +24,20 @@ const ContributorThankYouPopup: React.FC<ContributorThankYouPopupProps> = ({
           ✕
         </button>
 
-        <div className="mb-3 text-4xl">🤍</div>
-
-        <h2 className="mb-3 text-2xl font-bold text-slate-900">
-          ধন্যবাদ{contributor.name ? ` ${contributor.name}` : ""}! 🎉
+        <h2 className="mb-2 text-xl font-bold text-slate-900">
+          ধন্যবাদ{contributor.name ? ` ${contributor.name}` : ""}! 🤍
         </h2>
 
-        <p className="mb-4 text-base leading-relaxed text-slate-700">
-          {contributor.contribution} তোমাকে অনেক ধন্যবাদ। তোমার মতো মানুষদের
-          সাহায্যেই এই সাইটটা দিন দিন আরও ভালো হচ্ছে।
-        </p>
-
-        <p className="mb-6 rounded-lg bg-indigo-50 px-4 py-3 text-sm font-medium text-indigo-800">
-          {contributor.result ??
-            "তোমার নাম Contributions লিস্টে যোগ করা হয়েছে।"}{" "}
-          আবার কোনো ডিজাইন বা আইডিয়া থাকলে নির্দ্বিধায় পাঠিয়ে দিও — আমরা
-          অপেক্ষায় আছি! ✨
+        <p className="mb-4 text-sm leading-relaxed text-slate-700">
+          {contributor.contribution} ধন্যবাদ।{" "}
+          {contributor.result ?? "তোমার নাম Contributions লিস্টে আছে।"}
         </p>
 
         <button
           onClick={onClose}
           className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
         >
-          ধন্যবাদ, বুঝতে পেরেছি ✅
+          ঠিক আছে ✅
         </button>
       </div>
     </div>
