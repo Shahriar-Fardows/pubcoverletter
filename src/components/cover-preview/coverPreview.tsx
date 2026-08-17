@@ -33,6 +33,17 @@ const TEMPLATES: Template[] = [
   },
 ]
 
+// Date input theke ase "YYYY-MM-DD", but faculty ra "DD/MM/YYYY" chay
+const formatSubmissionDate = (value: string): string => {
+  const parts = value.split("-")
+  if (parts.length === 3) {
+    const [year, month, day] = parts
+    return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`
+  }
+  // already formatted / unknown format hole ja ase tai dekhabo
+  return value
+}
+
 const CoverPreview: React.FC<CoverPreviewProps> = ({
   coverData,
   selectedTemplateId,
@@ -61,8 +72,11 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({
     TEMPLATES.find((t) => t.id === selectedTemplateId) ?? TEMPLATES[0]
   const TemplateComponent = currentTemplate.component
 
-  // Ei ta protibar render e notun date dibe
-  const today = new Date().toISOString().split("T")[0]
+  // Ei ta protibar render e notun date dibe (local date, DD/MM/YYYY)
+  const now = new Date()
+  const today = `${String(now.getDate()).padStart(2, "0")}/${String(
+    now.getMonth() + 1,
+  ).padStart(2, "0")}/${now.getFullYear()}`
 
   // MAIN PART: user data + default merge
   const displayData: CoverFormValues = {
@@ -76,7 +90,9 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({
     courseCode: coverData?.courseCode || "MAT123",
     studentName: coverData?.studentName || "Nafisa Yeasmin",
     studentID: coverData?.studentID || "2511086038",
-    submissionDate: coverData?.submissionDate || today,
+    submissionDate: coverData?.submissionDate
+      ? formatSubmissionDate(coverData.submissionDate)
+      : today,
     batch: coverData?.batch || "252",
     sectionBatch: coverData?.sectionBatch || "1st",
     teacherName: coverData?.teacherName || "NAFIA MOLLIK",
